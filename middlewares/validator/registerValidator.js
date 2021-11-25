@@ -69,7 +69,7 @@ exports.registerValidator = async (req, res, next) => {
       ])
     ) {
       errors.push(
-        "Password must has at least 10 characters that include at least 1 lowercase character, 1 uppercase characters, 1 number, and 1 special character in (!@#$%^&*)'"
+        "Password must has at least 10 characters that include at least 1 lowercase character, 1 uppercase characters, and 1 number"
       );
     }
 
