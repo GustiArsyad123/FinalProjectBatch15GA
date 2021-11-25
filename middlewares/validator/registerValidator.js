@@ -40,7 +40,7 @@ exports.registerValidator = async (req, res, next) => {
     if (findEmail) {
       errors.push("Email already registered!!");
     }
-    if (!validator.isEmail(req.body.userName)) {
+    if (!validator.isEmpty(req.body.userName)) {
       errors.push("User Name is not valid");
     }
     if (!validator.isEmail(req.body.email)) {
