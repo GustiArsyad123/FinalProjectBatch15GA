@@ -7,6 +7,8 @@ const cors = require("cors");
 const app = express()
 const port = process.env.PORT || 3000
 
+const errorHandler = require('./middlewares/errorHandler/errorHandler');
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,5 +28,7 @@ app.get('/', (req, res) => {
 app.get('*', (req, res, next) => {
     res.send("404 Page Not Found");
 });
+
+app.use(errorHandler);
 
 app.listen(port, () => console.log(`Server running smoothly on ${port}`));
