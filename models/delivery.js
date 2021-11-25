@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       models.delivery.hashMany(models.order, { foreignKey: "id_order" });
     }
   }
-  deliverys.init(
+  delivery.init(
     {
       firstName: DataTypes.STRING,
       lastName: DataTypes.STRING,
