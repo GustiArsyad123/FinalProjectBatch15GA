@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       models.review.belongsTo(models.type, { foreignKey: "id_type" });
     }
   }
-  reviews.init(
+  review.init(
     {
       id_user: DataTypes.INTEGER,
       id_recipe: DataTypes.INTEGER,
