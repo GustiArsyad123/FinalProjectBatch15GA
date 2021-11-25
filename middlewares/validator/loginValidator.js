@@ -1,34 +1,76 @@
-const { user } = require("../../models/user");
-const encryption = require("../utils/encryption");
-const { generateToken } = require("../utils/jwt");
+const path = require("path");
+const crypto = require("crypto");
+const validator = require("validator");
+const { promisify } = require("util");
+const UsersController = require("../../controllers/users");
+const { users } = require("../../models");
 
-class SignIn {
-  static async signIn(req, res, next) {
-    const email = req.body.email;
-    const password = req.body.password;
-
-    const data = await user.findOne({ where: { email: email } });
-    if (!data) {
-      return res.status(400).json({ message: "email yang diisi salah" });
+exports.getDetailValidator = async (req, res, next) => {
+  try {
+    if (!validator.isNumeric(req.param.id)) {
+      return next({ message: "id not valid", statusCode: 400 });
     }
-
-    let isPassValid = encryption.isPassValid(password, data.password);
-    if (!isPassValid) {
-      return res.status(401).json({ message: "kata sandi yang dimasukkan salah" });
-    }
-
-    const { id, firstname, lastname } = data;
-
-    const payload = {
-      id,
-      email,
-      firstname,
-      lastname,
-    };
-
-    const token = generateToken(payload);
-    return res.status(200).json({ message: "login succes", token });
+    next();
+  } catch (error) {
+    next(error);
   }
-}
+};
+exports.createUpdateUserValidator = async (req, res, next) => {
+  try {
+    const errors = [];
+    if (
+      !validator.isLength(req.body.firstName, {
+        min: 5,
+      })
+    ) {
+      errors.push("Please Input First Name at least 5 Characters !");
+    }
+    if (validator.isEmpty(req.body.lastName, { ignore_whitespace: false })) {
+      errors.push("Please input Last Name");
+    }
+    const findEmail = await users.findOne({
+      where: { email: req.body.email },
+    });
+    if (findEmail) {
+      errors.push("Email already registered!!");
+    }
+    if (!validator.isEmail(req.body.email)) {
+      errors.push("Email is not valid");
+    }
+    if (req.body.password !== req.body.confirmPassword) {
+      errors.push("Password and confirm Password didn't match!");
+    }
+    if (
+      !validator.isStrongPassword(req.body.password, [
+        {
+          minLength: 10,
+          maxLength: 20,
+          minLowercase: 1,
+          minUppercase: 1,
+          minNumbers: 1,
+          minSymbols: 1,
+          returnScore: false,
+          pointsPerUnique: 0,
+          pointsPerRepeat: 0,
+          pointsForContainingLower: 10,
+          pointsForContainingUpper: 10,
+          pointsForContainingNumber: 10,
+          pointsForContainingSymbol: 10,
+        },
+      ])
+    ) {
+      errors.push(
+        "Password must has at least 10 characters that include at least 1 lowercase character, 1 uppercase characters, 1 number, and 1 special character in (!@#$%^&*)'"
+      );
+    }
 
-module.exports = SignIn;
+    if (errors.length > 0) {
+      return res.status(400).json({ errors: errors });
+    }
+
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ errors: ["Bad request"] });
+  }
+};
