@@ -52,12 +52,12 @@ exports.registerValidator = async (req, res, next) => {
     if (
       !validator.isStrongPassword(req.body.password, [
         {
-          minLength: 10,
+          minLength: 8,
           maxLength: 20,
           minLowercase: 1,
           minUppercase: 1,
           minNumbers: 1,
-          minSymbols: 1,
+          minSymbols: 0,
           returnScore: false,
           pointsPerUnique: 0,
           pointsPerRepeat: 0,
