@@ -9,13 +9,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       models.users.hasMany(models.recipe, {
-        foreignKey: "userId",
+        foreignKey: "id_user",
       });
       models.users.hasMany(models.review, {
-        foreignKey: "userId",
+        foreignKey: "id_user",
       });
       models.users.hasMany(models.order, {
-        foreignKey: "userId",
+        foreignKey: "id_user",
       });
       // define association here
     }
