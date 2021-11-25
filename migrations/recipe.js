@@ -25,19 +25,19 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       title: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.STRING
       },
       duration: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.STRING
       },
       serving: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.STRING
       },
       image: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE
       },
       description: {
