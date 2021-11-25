@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  users.init(
+  user.init(
     {
       firstName: DataTypes.STRING,
       lastName: DataTypes.STRING,
@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       paranoid: true,
       timestamps: true,
-      modelName: "users",
+      modelName: "user",
     }
   );
   return user;
