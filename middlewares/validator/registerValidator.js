@@ -1,8 +1,6 @@
 const path = require("path");
-const crypto = require("crypto");
 const validator = require("validator");
-const { promisify } = require("util");
-const UsersController = require("../../controllers/users");
+const UsersController = require("../../controllers/user");
 const { user } = require("../../models");
 
 exports.getDetailValidator = async (req, res, next) => {
