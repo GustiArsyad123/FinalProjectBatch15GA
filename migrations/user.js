@@ -32,16 +32,21 @@ module.exports = {
       },
 
       phoneNumber: {
-        type: Sequelize.STRING,
+        type: Sequelize.integer,
+        unique: true,
+        allowNull: true,
       },
       address: {
         type: Sequelize.STRING,
+        allowNull: true,
       },
       location: {
         type: Sequelize.STRING,
+        allowNull: true,
       },
       image: {
         type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
