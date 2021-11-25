@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       paranoid: true,
       timestamps: true,
-      modelName: "users",
+      modelName: "category",
     }
   );
   return category;
