@@ -8,19 +8,19 @@ exports.signUpCompleteValidator = async (req, res, next) => {
   try {
     const errors = [];
 
-    if (validator.isEmpty(req.body.phoneNumber, { ignore_whitespace:false })) {
+    if (validator.isEmpty(req.body.phoneNumber, { ignore_whitespace: false })) {
       errors.push("Please enter your phone number");
     }
     // if (!validator.isNumeric(req.body.phoneNumber)) {
     //   errors.push("Phone number must be number");
     // }
-    if (validator.isEmpty(req.body.address, { ignore_whitespace:false })) {
-      errors.push("Please enter your address");
+    if (validator.isEmpty(req.body.address, { ignore_whitespace: false })) {
+      errors.push("Please input your address");
     }
-    if (validator.isEmpty(req.body.location, { ignore_whitespace:false })) {
-      errors.push("Please enter your location(city)");
+    if (validator.isEmpty(req.body.location, { ignore_whitespace: false })) {
+      errors.push("Please input your location(city)");
     }
- 
+
     if (errors.length > 0) {
       return res.status(400).json({ success: false, errors: errors });
     }
@@ -48,10 +48,11 @@ exports.signUpCompleteValidator = async (req, res, next) => {
 
       await move(`./public/images/${file.name}`);
 
-      const image = await cloudinary.uploader.upload(`./public/images/${file.name}`)
-      .then((result) => {
-          return result.secure_url
-      });
+      const image = await cloudinary.uploader
+        .upload(`./public/images/${file.name}`)
+        .then((result) => {
+          return result.secure_url;
+        });
 
       req.body.image = image;
     }
