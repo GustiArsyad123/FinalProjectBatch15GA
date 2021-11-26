@@ -4,6 +4,12 @@ class Delivery {
   async createDelivery(req, res, next) {
     try {
       const userId = req.userData.id;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+      if (checkUser.id != userId) {
+        return res.status(401).json({ success: false, errors: ["You must have permission to delete it."] });
+      }
       const { firstName, lastName, phoneNumber, address } = req.body;
       const data = await delivery.create({
         firstName,
@@ -25,7 +31,7 @@ class Delivery {
         where: { id: userId },
       });
 
-      if (checkUser.id !== userId) {
+      if (checkUser.id != userId) {
         return res.status(401).json({ success: false, errors: ["You must have permission to delete it."] });
       }
 
@@ -52,7 +58,7 @@ class Delivery {
         where: { id: userId },
       });
 
-      if (checkUser.id !== userId) {
+      if (checkUser.id != userId) {
         return res.status(401).json({ success: false, errors: ["You must have permission to delete it."] });
       }
 
@@ -78,7 +84,7 @@ class Delivery {
         where: { id: userId },
       });
 
-      if (checkUser.id !== userId) {
+      if (checkUser.id != userId) {
         return res.status(401).json({ success: false, errors: ["You must signin first, because you don't have permission to access."] });
       }
 
@@ -119,7 +125,7 @@ class Delivery {
         where: { id: userId },
       });
 
-      if (checkUser.id !== userId) {
+      if (checkUser.id != userId) {
         return res.status(401).json({ success: false, errors: ["You must have permission to delete it."] });
       }
 
