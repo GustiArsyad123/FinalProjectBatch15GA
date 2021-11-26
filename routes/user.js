@@ -4,7 +4,7 @@ const { signUpCompleteValidator } = require('../middlewares/validators/signUpCom
 const { signInValidator } = require('../middlewares/validators/signInValidator');
 const { authentication } = require('../middlewares/auth/authentication');
 // const { authorization } = require('../middlewares/auth/authorization');
-
+////////////////////////
 const {
     createUser,
     getDetailUser,

@@ -1,6 +1,6 @@
 const { verifyToken } = require("../../utils/jwt");
 const { user } = require("../../models");
-
+/////////////////
 exports.authentication = async (req, res, next) => {
     try {
         const token = req.headers.access_token
