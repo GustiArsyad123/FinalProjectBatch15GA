@@ -102,16 +102,13 @@ class User {
     }
   }
 
-  async updateUser(req, res, next) {
+  async updatePassword(req, res, next) {
     try {
       const userId = req.userData.id
-      const { first_name, last_name, email, password } = req.body
+      const { password, confirmPassword } = req.body
       const hashPassword = encodePin(password)
 
-      const updateData = await user.update({
-        first_name,
-        last_name,
-        email,
+      const updatePassword = await user.update({
         password: hashPassword,
       },
       {
@@ -124,7 +121,7 @@ class User {
         },
       });
 
-      res.status(201).json({ success: true, message: ["Success Update Data"] });
+      res.status(201).json({ success: true, message: ["Success Update Password"] });
 
     } catch (error) {
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
