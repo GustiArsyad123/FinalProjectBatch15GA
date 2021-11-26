@@ -13,7 +13,7 @@ exports.getDetailValidator = async (req, res, next) => {
     next(error);
   }
 };
-exports.registerValidator = async (req, res, next) => {
+exports.signUpValidator = async (req, res, next) => {
   try {
     const errors = [];
     if (
@@ -77,7 +77,6 @@ exports.registerValidator = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ errors: ["Bad request"] });
+    res.status(401).json({ errors: ["Bad request"] });
   }
 };
