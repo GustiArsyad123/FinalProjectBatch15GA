@@ -1,19 +1,20 @@
 const path = require("path");
-const crypto = require("crypto");
 const validator = require("validator");
-const { promisify } = require("util");
-const UsersController = require("../../controllers/user");
-const { users } = require("../../models");
 
 exports.signInValidator = async (req, res, next) => {
   try {
     const errors = [];
 
+    if (validator.isEmpty(req.body.email)) {
+      errors.push("Please input your password");
+    }
+
     if (!validator.isEmail(req.body.email)) {
       errors.push("Email is not valid");
     }
-    if (req.body.password !== req.body.confirmPassword) {
-      errors.push("Password and confirm Password didn't match!");
+
+    if (validator.isEmpty(req.body.password)) {
+      errors.push("Please input your password");
     }
 
     if (errors.length > 0) {

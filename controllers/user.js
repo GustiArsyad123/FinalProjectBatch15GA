@@ -24,29 +24,7 @@ class User {
     try {
       const { userName, email, password } = req.body
       const hashPassword = encodePin(password)
-
-      const checkUsername = await user.findOne({
-        where: {
-          userName: userName
-        }
-      })
-
-      if (checkUsername != null) {
-        return res.status(500).json({ success: false, errors: ["Cannot register, username was registered"] });
-      }
-
-      const checkEmail = await user.findOne({
-        where: {
-          email: email,
-        }
-      })
-
-      if (checkEmail != null) {
-        return res.status(500).json({ success: false, errors: ["Cannot register, email was registered"] });
-      }
-
-      if ((checkUsername && checkEmail) == null) {
- 
+     
         const newUser = await user.create({
           userName,
           email,
@@ -58,17 +36,45 @@ class User {
             email: email,
           },
           attributes: {
-            include: ["userName", "email", "password"],
+            exclude: ["createdAt", "updatedAt", "deletedAt"],
           }
         })
 
-        const payload = data.dataValues
+        const payload = {id: data.dataValues.id, userName: data.dataValues.userName, email: data.dataValues.email}
         const token = createToken(payload)
 
         res.status(200).json({ success: true, data: data, token: token });
-      }
 
     } catch (error) {
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async completeSignUp(req, res, next) {
+    try {
+      const userId = req.userData.id
+      const { image, phoneNumber, address, location } = req.body
+
+      const updateData = await user.update({
+        image,
+        phoneNumber,
+        address,
+        location
+      },
+      {
+        where: { id: +userId },
+      });
+
+      const data = await user.findOne({
+        where: {
+          id: +userId,
+        },
+      });
+
+      res.status(201).json({ success: true, message: ["Success Update Data"], data: data });
+
+    } catch (error) {
+      console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
@@ -107,6 +113,10 @@ class User {
       const userId = req.userData.id
       const { password, confirmPassword } = req.body
       const hashPassword = encodePin(password)
+
+      if(password != confirmPassword){
+        return res.status(400).json({ success: false, errors: ['Password and Confirm Password not match']})
+      }
 
       const updatePassword = await user.update({
         password: hashPassword,
@@ -179,14 +189,14 @@ class User {
         })
       }
 
-      const payload = loginUser.dataValues
+      const payload = {id: loginUser.dataValues.id, userName: loginUser.dataValues.userName, email: loginUser.dataValues.email}
       const token = createToken(payload)
       res.status(200).json({
         success: true,
-        token: token,
-
+        token: token
       })
     } catch (error) {
+      console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }

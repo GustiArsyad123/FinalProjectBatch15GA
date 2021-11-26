@@ -1,23 +1,41 @@
-// Import decode token
 const { verifyToken } = require("../../utils/jwt");
+const { user } = require("../../models");
 
-// Make validator authentication
-class Authentication {
-  static isSignedIn(req, res, next) {
-    if (!req.headers.token) {
-      return res.status(401).json({
-        statusCode: 401,
-        message: "Please sign in first",
-      });
+exports.authentication = async (req, res, next) => {
+    try {
+        const token = req.headers.access_token
+
+    if (token) {
+        const payload = verifyToken(token)
+        const email = payload.email
+
+        console.log(email);
+
+        const loginUser = await user.findOne({
+        where: {
+          email: email,
+        }
+        });
+
+        console.log(loginUser);
+
+        if (loginUser) {
+          req.userData = payload
+          next()
+        } else {
+            res.status(401).json({
+              success: false,
+              errors: "Please Login"
+            })
+        }
+
+    } else {
+        res.status(401).json({
+          success: false,
+          errors: "Please Login"
+        })
     }
-    //   Save token to userData
-    let token = req.headers.token;
-
-    let userData = verifyToken(token);
-    req.userData = userData;
-
-    next(error);
+  } catch (error) {
+    res.status(500).json({ success: false, errors: ["Internal Server Error"] });
   }
 }
-
-module.exports = Authentication;
