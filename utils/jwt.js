@@ -1,4 +1,4 @@
-require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
+require("dotenv").config();
 const jwt = require("jsonwebtoken")
 
 const createToken = (payload) => {
