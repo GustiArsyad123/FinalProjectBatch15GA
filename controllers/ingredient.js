@@ -11,7 +11,7 @@ class Ingredient {
         stock: req.body.stock,
       });
 
-      // Find Data Order
+      // Find Data Ingredient
       const data = await order.findOne({
         where: {
           id: newData.id,
