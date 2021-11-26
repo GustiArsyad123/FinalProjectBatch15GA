@@ -2,9 +2,9 @@ const express = require('express');
 const { signUpValidator, changePassword } = require('../middlewares/validators/signUpValidator');
 const { signUpCompleteValidator } = require('../middlewares/validators/signUpCompleteValidator');
 const { signInValidator } = require('../middlewares/validators/signInValidator');
+const { updateUserValidator } = require('../middlewares/validators/updateUserValidator');
 const { authentication } = require('../middlewares/Auth/authentication');
-// const { authorization } = require('../middlewares/auth/authorization');
-////////////////////////
+
 const {
     createUser,
     getDetailUser,
@@ -20,9 +20,9 @@ const router = express.Router();
 router.post('/signup', signUpValidator, createUser);
 router.put('/complete-signup', signUpCompleteValidator, authentication, completeSignUp);
 router.post('/login', signInValidator, login);
-router.put('/changeprofile', authentication, updateUser);
+router.put('/changeprofile', updateUserValidator, authentication, updateUser);
 router.put('/changepassword', changePassword, authentication, updatePassword);
 router.get('/', authentication, getDetailUser);
-router.delete('/', deleteUser);
+router.delete('/', authentication, deleteUser);
 
 module.exports = router; 
