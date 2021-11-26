@@ -9,12 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      models.event.hasMany(models.review, { foreignKey: "id_recipe" });
-      models.event.hasMany(models.order, { foreignKey: "id_recipe" });
-      models.event.belongsTo(models.category, { foreignKey: "id_category" });
-      models.event.belongsTo(models.user, { foreignKey: "id_user" });
-      models.event.belongsTo(models.type, { foreignKey: "id_type" });
-      models.event.belongsTo(models.ingredient, { foreignKey: "id_ingredient" });
+      models.recipe.hasMany(models.review, { foreignKey: "id_recipe" });
+      models.recipe.hasMany(models.order, { foreignKey: "id_recipe" });
+      models.recipe.belongsTo(models.category, { foreignKey: "id_category" });
+      models.recipe.belongsTo(models.user, { foreignKey: "id_user" });
+      models.recipe.belongsTo(models.type, { foreignKey: "id_type" });
+      models.recipe.belongsTo(models.ingredient, { foreignKey: "id_ingredient" });
     }
   };
   recipe.init({
