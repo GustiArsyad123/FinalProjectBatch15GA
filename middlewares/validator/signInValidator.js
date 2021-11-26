@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const validator = require("validator");
 const { promisify } = require("util");
 const UsersController = require("../../controllers/users");
-const { users } = require("../../models");
+const { user } = require("../../models");
 
 exports.signInValidator = async (req, res, next) => {
   try {
