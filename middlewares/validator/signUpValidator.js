@@ -1,19 +1,9 @@
 const path = require("path");
 const validator = require("validator");
-const UsersController = require("../../controllers/user");
+require("../../controllers/user");
 const { user } = require("../../models");
 
-exports.getDetailValidator = async (req, res, next) => {
-  try {
-    if (!validator.isNumeric(req.param.id)) {
-      return next({ message: "id not valid", statusCode: 400 });
-    }
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
-exports.registerValidator = async (req, res, next) => {
+exports.signUpValidator = async (req, res, next) => {
   try {
     const errors = [];
     if (
@@ -26,10 +16,10 @@ exports.registerValidator = async (req, res, next) => {
     if (validator.isEmpty(req.body.lastName, { ignore_whitespace: false })) {
       errors.push("Please input Last Name");
     }
-    const finduserName = await users.findOne({
+    const finduserName = await user.findOne({
       where: { userName: req.body.email },
     });
-    const findEmail = await users.findOne({
+    const findEmail = await user.findOne({
       where: { email: req.body.email },
     });
     if (finduserName) {
@@ -72,12 +62,11 @@ exports.registerValidator = async (req, res, next) => {
     }
 
     if (errors.length > 0) {
-      return res.status(400).json({ errors: errors });
+      return res.status(400).json({ errors: errors, sucsess: false });
     }
 
     next();
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ errors: ["Bad request"] });
+    res.status(401).json({ errors: ["Bad request"], sucsess: false });
   }
 };

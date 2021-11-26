@@ -7,6 +7,7 @@ const cors = require("cors");
 const app = express()
 const port = process.env.PORT || 3000
 
+const user = require('./routes/user')
 const errorHandler = require('./middlewares/errorHandler/errorHandler');
 
 app.use(cors());
@@ -24,6 +25,8 @@ cloudinary.config({
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
+
+app.use('/user', user)
 
 app.get('*', (req, res, next) => {
     res.send("404 Page Not Found");
