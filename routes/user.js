@@ -22,7 +22,7 @@ router.put('/complete-signup', signUpCompleteValidator, authentication, complete
 router.post('/login', signInValidator, login);
 router.put('/changeprofile', authentication, updateUser);
 router.put('/changepassword', changePassword, authentication, updatePassword);
-router.get('/', getDetailUser);
+router.get('/', authentication, getDetailUser);
 router.delete('/', deleteUser);
 
 module.exports = router; 
