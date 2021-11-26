@@ -2,7 +2,7 @@ const express = require('express');
 const { signUpValidator, changePassword } = require('../middlewares/validators/signUpValidator');
 const { signUpCompleteValidator } = require('../middlewares/validators/signUpCompleteValidator');
 const { signInValidator } = require('../middlewares/validators/signInValidator');
-const { authentication } = require('../middlewares/auth/authentication');
+const { authentication } = require('../middlewares/Auth/authentication');
 // const { authorization } = require('../middlewares/auth/authorization');
 ////////////////////////
 const {
