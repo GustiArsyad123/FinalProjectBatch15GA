@@ -82,13 +82,16 @@ class User {
   async updateUser(req, res, next) {
     try {
       const userId = req.userData.id
-      const { first_name, last_name, email, phoneNumber, address, location } = req.body
-      const hashPassword = encodePin(password)
+      const { firstName, lastName, email, phoneNumber, address, location, image } = req.body
 
       const updateData = await user.update({
-        first_name,
-        last_name,
+        firstName,
+        lastName,
         email,
+        phoneNumber,
+        address,
+        location,
+        image
       },
       {
         where: { id: +userId },
@@ -103,6 +106,7 @@ class User {
       res.status(201).json({ success: true, message: ["Success Update Data"] });
 
     } catch (error) {
+      console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }

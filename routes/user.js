@@ -20,7 +20,7 @@ const router = express.Router();
 router.post('/signup', signUpValidator, createUser);
 router.put('/complete-signup', signUpCompleteValidator, authentication, completeSignUp);
 router.post('/login', signInValidator, login);
-router.put('/changeprofile', updateUser);
+router.put('/changeprofile', authentication, updateUser);
 router.put('/changepassword', changePassword, authentication, updatePassword);
 router.get('/', getDetailUser);
 router.delete('/', deleteUser);
