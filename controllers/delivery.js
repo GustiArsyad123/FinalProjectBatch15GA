@@ -1,4 +1,4 @@
-const { delivery } = require("../models");
+const { delivery, recipe } = require("../models");
 
 class Delivery {
   static async createDelivery(req, res, next) {
@@ -16,9 +16,12 @@ class Delivery {
         where: {
           id: newData.id,
         },
-        attributes: {
-          exclute: ["createdAt", "deletedAt"],
-        },
+        attributes: { exclude: ["createdAt", "deletedAt"] },
+        include: [
+          {
+            model: recipe,
+          },
+        ],
       });
 
       res.status(201).json({ data, message: ["Success Add Delivery"] });
