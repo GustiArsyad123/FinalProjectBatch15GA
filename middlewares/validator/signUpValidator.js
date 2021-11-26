@@ -1,6 +1,6 @@
 const path = require("path");
 const validator = require("validator");
-const UsersController = require("../../controllers/user");
+require("../../controllers/user");
 const { user } = require("../../models");
 
 exports.getDetailValidator = async (req, res, next) => {
@@ -26,10 +26,10 @@ exports.signUpValidator = async (req, res, next) => {
     if (validator.isEmpty(req.body.lastName, { ignore_whitespace: false })) {
       errors.push("Please input Last Name");
     }
-    const finduserName = await users.findOne({
+    const finduserName = await user.findOne({
       where: { userName: req.body.email },
     });
-    const findEmail = await users.findOne({
+    const findEmail = await user.findOne({
       where: { email: req.body.email },
     });
     if (finduserName) {
