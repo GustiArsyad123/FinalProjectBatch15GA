@@ -62,11 +62,11 @@ exports.signUpValidator = async (req, res, next) => {
     }
 
     if (errors.length > 0) {
-      return res.status(400).json({ errors: errors, sucsess: false });
+      return res.status(400).json({ success: false, errors: errors });
     }
 
     next();
   } catch (error) {
-    res.status(401).json({ errors: ["Bad request"], sucsess: false });
+    res.status(401).json({ success: false, errors: ["Bad request"] });
   }
 };

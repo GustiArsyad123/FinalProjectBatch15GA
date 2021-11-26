@@ -19,9 +19,6 @@
     "url": "https://gitlab.com/binarxglints_batch15/finalproject/chefbox/backend/issues"
   },
   "homepage": "https://gitlab.com/binarxglints_batch15/finalproject/chefbox/backend#readme",
-  "engines": {
-    "node": "14.x"
-  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.27.1",
