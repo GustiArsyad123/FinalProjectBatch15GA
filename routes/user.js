@@ -3,7 +3,7 @@ const { signUpValidator, changePassword } = require('../middlewares/validators/s
 const { signUpCompleteValidator } = require('../middlewares/validators/signUpCompleteValidator');
 const { signInValidator } = require('../middlewares/validators/signInValidator');
 // const { authentication } = require('../middlewares/auth/authentication');
-const { authorization } = require('../middlewares/auth/authorization');
+// const { authorization } = require('../middlewares/auth/authorization');
 
 const {
     createUser,
