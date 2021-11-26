@@ -3,16 +3,6 @@ const validator = require("validator");
 require("../../controllers/user");
 const { user } = require("../../models");
 
-exports.getDetailValidator = async (req, res, next) => {
-  try {
-    if (!validator.isNumeric(req.param.id)) {
-      return next({ message: "id not valid", statusCode: 401 });
-    }
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
 exports.signUpValidator = async (req, res, next) => {
   try {
     const errors = [];
