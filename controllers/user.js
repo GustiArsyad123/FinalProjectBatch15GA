@@ -82,14 +82,13 @@ class User {
   async updateUser(req, res, next) {
     try {
       const userId = req.userData.id
-      const { first_name, last_name, email, password } = req.body
+      const { first_name, last_name, email, phoneNumber, address, location } = req.body
       const hashPassword = encodePin(password)
 
       const updateData = await user.update({
         first_name,
         last_name,
         email,
-        password: hashPassword,
       },
       {
         where: { id: +userId },
