@@ -17,12 +17,12 @@ exports.signInValidator = async (req, res, next) => {
     }
 
     if (errors.length > 0) {
-      return res.status(400).json({ errors: errors });
+      return res.status(400).json({ errors: errors, sucees: false });
     }
 
     next();
   } catch (error) {
     console.log(error);
-    res.status(401).json({ errors: ["Bad request"] });
+    res.status(401).json({ errors: ["Bad request"], sucsess: false });
   }
 };

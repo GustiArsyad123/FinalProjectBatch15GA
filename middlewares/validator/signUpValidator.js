@@ -6,7 +6,7 @@ const { user } = require("../../models");
 exports.getDetailValidator = async (req, res, next) => {
   try {
     if (!validator.isNumeric(req.param.id)) {
-      return next({ message: "id not valid", statusCode: 400 });
+      return next({ message: "id not valid", statusCode: 401 });
     }
     next();
   } catch (error) {
@@ -72,11 +72,11 @@ exports.signUpValidator = async (req, res, next) => {
     }
 
     if (errors.length > 0) {
-      return res.status(400).json({ errors: errors });
+      return res.status(400).json({ errors: errors, sucsess: false });
     }
 
     next();
   } catch (error) {
-    res.status(401).json({ errors: ["Bad request"] });
+    res.status(401).json({ errors: ["Bad request"], sucsess: false });
   }
 };
