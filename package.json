@@ -5,6 +5,7 @@
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
+    "start": "node index.js",
     "dev": "NODE_ENV=development npx nodemon index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
