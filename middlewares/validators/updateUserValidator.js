@@ -45,16 +45,6 @@ exports.updateUserValidator = async (req, res, next) => {
       errors.push("Please insert your picture");
     }
 
-    const checkUsername = await user.findOne({
-      where: {
-        userName: req.body.userName,
-      },
-    });
-
-    if (checkUsername != null) {
-      errors.push("Username was registered");
-    }
-
     const checkEmail = await user.findOne({
       where: {
         email: req.body.email,
@@ -90,7 +80,6 @@ exports.updateUserValidator = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log(error);
     res.status(401).json({ success: false, errors: ["Bad request"] });
   }
 };
