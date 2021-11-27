@@ -20,9 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       models.order.belongsTo(models.category, {
         foreignKey: "id_category",
       });
-      models.order.belongsTo(models.ingredient, {
-        foreignKey: "id_ingredient",
-      });
 
       // define association here
     }
@@ -33,10 +30,9 @@ module.exports = (sequelize, DataTypes) => {
       id_user: DataTypes.INTEGER,
       id_recipe: DataTypes.INTEGER,
       id_type: DataTypes.INTEGER,
-      id_ingredient: DataTypes.INTEGER,
       quantity: DataTypes.INTEGER,
       subtotal: DataTypes.INTEGER,
-      uploadRecipe: DataTypes.STRING,
+      uploadReceipt: DataTypes.STRING,
       deliveryFee: DataTypes.INTEGER,
       total: DataTypes.INTEGER
     },

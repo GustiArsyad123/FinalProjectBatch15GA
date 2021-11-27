@@ -14,20 +14,22 @@ module.exports = (sequelize, DataTypes) => {
       models.recipe.belongsTo(models.category, { foreignKey: "id_category" });
       models.recipe.belongsTo(models.user, { foreignKey: "id_user" });
       models.recipe.belongsTo(models.type, { foreignKey: "id_type" });
-      models.recipe.belongsTo(models.ingredient, { foreignKey: "id_ingredient" });
     }
   };
   recipe.init({
     id_category: DataTypes.INTEGER,
     id_user: DataTypes.INTEGER,
     id_type: DataTypes.INTEGER,
-    id_ingredient: DataTypes.INTEGER,
     title: DataTypes.STRING,
     duration: DataTypes.STRING,
     serving: DataTypes.STRING,
     image: DataTypes.STRING,
     description: DataTypes.STRING,
-    direction: DataTypes.STRING
+    direction: DataTypes.STRING,
+    ingredient: DataTypes.STRING,
+    stock: DataTypes.INTEGER,
+    price: DataTypes.INTEGER,
+    location: DataTypes.STRING,
   }, {
     sequelize,
     paranoid: true,

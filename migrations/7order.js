@@ -24,10 +24,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER
       },
-      id_ingredient: {
-        allowNull: false,
-        type: Sequelize.INTEGER
-      },
       quantity: {
         allowNull: true,
         type: Sequelize.INTEGER
@@ -36,7 +32,7 @@ module.exports = {
         allowNull: true,
         type: Sequelize.INTEGER
       },
-      uploadRecipe: {
+      uploadReceipt: {
         allowNull: true,
         type: Sequelize.STRING
       },
@@ -111,20 +107,6 @@ module.exports = {
         references: {
           //Required field
           table: 'recipes',
-          field: 'id',
-        },
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      });
-
-      // id_ingredient foreign key
-    await queryInterface.addConstraint('orders', {
-        fields: ['id_ingredient'],
-        type: 'foreign key',
-        name: 'custom_fkey_id_ingredientOrder',
-        references: {
-          //Required field
-          table: 'ingredients',
           field: 'id',
         },
         onDelete: 'cascade',

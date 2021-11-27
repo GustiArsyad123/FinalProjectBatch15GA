@@ -38,13 +38,29 @@ module.exports = {
       },
       image: {
         allowNull: true,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       description: {
         allowNull: true,
         type: Sequelize.STRING
       },
       direction: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
+      ingredient: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
+      stock: {
+        allowNull: true,
+        type: Sequelize.INTEGER
+      },
+      price: {
+        allowNull: true,
+        type: Sequelize.INTEGER
+      },
+      location: {
         allowNull: true,
         type: Sequelize.STRING
       },
@@ -97,20 +113,6 @@ module.exports = {
         references: {
           //Required field
           table: 'types',
-          field: 'id',
-        },
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      });
-
-      // id_ingredient foreign key
-    await queryInterface.addConstraint('recipes', {
-        fields: ['id_ingredient'],
-        type: 'foreign key',
-        name: 'custom_fkey_id_ingredientRecipe',
-        references: {
-          //Required field
-          table: 'ingredients',
           field: 'id',
         },
         onDelete: 'cascade',
