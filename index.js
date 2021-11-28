@@ -7,7 +7,8 @@ const cors = require("cors");
 const app = express()
 const port = process.env.PORT || 3000
 
-const user = require('./routes/user')
+const user = require('./routes/user');
+const recipe = require('./routes/recipe')
 const errorHandler = require('./middlewares/errorHandler/errorHandler');
 
 app.use(cors());
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/user', user)
+app.use('/recipe', recipe)
 
 app.get('*', (req, res, next) => {
     res.send("404 Page Not Found");

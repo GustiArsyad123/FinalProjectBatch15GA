@@ -1,11 +1,11 @@
 const path = require("path");
 const validator = require("validator");
 
-exports.createIngredientValidator = async (req, res, next) => {
+exports.createRecipeThreeValidator = async (req, res, next) => {
   try {
     const errors = [];
 
-    if (validator.isEmpty(req.body.ingredient, { ignore_whitespace: false })) {
+    if (validator.isEmpty(req.body.direction, { ignore_whitespace: false })) {
       errors.push("Please Check Your input, there are not allow to null ");
     }
 
@@ -15,6 +15,7 @@ exports.createIngredientValidator = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error);
     res.status(401).json({ success: false, errors: ["Bad request"] });
   }
 };

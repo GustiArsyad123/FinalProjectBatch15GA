@@ -1,18 +1,18 @@
 const path = require("path");
 const validator = require("validator");
 
-exports.createDirectionValidator = async (req, res, next) => {
+exports.createRecipeFourValidator = async (req, res, next) => {
   try {
     const errors = [];
 
-    if (validator.isNumeric(req.body.price, { ignore_whitespace: false })) {
+    if (!validator.isNumeric(req.body.price, { ignore_whitespace: false })) {
       errors.push("Input Only Number");
     }
-    if (validator.isNumeric(req.body.stock, { ignore_whitespace: false })) {
+    if (!validator.isNumeric(req.body.stock, { ignore_whitespace: false })) {
       errors.push("Input Only Number");
     }
     if (validator.isEmpty(req.body.location, { ignore_whitespace: false })) {
-      errors.push("Please Check Your Location, there are not allow to null ");
+      errors.push("Please Check Your Location, it cannot be empty ");
     }
 
     if (errors.length > 0) {

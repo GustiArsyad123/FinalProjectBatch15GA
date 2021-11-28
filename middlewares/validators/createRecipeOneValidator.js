@@ -3,9 +3,9 @@ const crypto = require("crypto");
 const cloudinary = require("cloudinary").v2;
 const validator = require("validator");
 const { promisify } = require("util");
-const { category } = require("../../models");
+// const { category } = require("../../models");
 
-exports.createDeskriptValidator = async (req, res, next) => {
+exports.createRecipeOneValidator = async (req, res, next) => {
   try {
     const errors = [];
 
@@ -54,16 +54,16 @@ exports.createDeskriptValidator = async (req, res, next) => {
     if (validator.isEmpty(req.body.duration, { ignore_whitespace: false })) {
       errors.push("Please fill the duration");
     }
-    const checkCategory = await category.findOne({
-      where: {
-        email: req.body.category,
-      },
-    });
-    if (checkCategory != null) {
-      errors.push("Pleas Choose The Category");
-    }
+    // const checkCategory = await category.findOne({
+    //   where: {
+    //     email: req.body.category,
+    //   },
+    // });
+    // if (checkCategory != null) {
+    //   errors.push("Pleas Choose The Category");
+    // }
     if (validator.isEmpty(req.body.serving, { ignore_whitespace: false })) {
-      errors.push("Please fill How to serving");
+      errors.push("Please fill this recipe for how many person");
     }
     if (validator.isEmpty(req.body.description, { ignore_whitespace: false })) {
       errors.push("Please fill description");
@@ -75,6 +75,7 @@ exports.createDeskriptValidator = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error);
     res.status(401).json({ success: false, errors: ["Bad request"] });
   }
 };

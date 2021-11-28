@@ -1,6 +1,6 @@
 const { verifyToken } = require("../../utils/jwt");
 const { user } = require("../../models");
-/////////////////
+
 exports.authentication = async (req, res, next) => {
     try {
         const token = req.headers.access_token
@@ -9,15 +9,11 @@ exports.authentication = async (req, res, next) => {
         const payload = verifyToken(token)
         const email = payload.email
 
-        console.log(email);
-
         const loginUser = await user.findOne({
         where: {
           email: email,
         }
         });
-
-        console.log(loginUser);
 
         if (loginUser) {
           req.userData = payload
