@@ -1,8 +1,8 @@
 const express = require('express');
-// const { signUpValidator, changePassword } = require('../middlewares/validators/signUpValidator');
-// const { signUpCompleteValidator } = require('../middlewares/validators/signUpCompleteValidator');
-// const { signInValidator } = require('../middlewares/validators/signInValidator');
-// const { updateUserValidator } = require('../middlewares/validators/updateUserValidator');
+const { createRecipeOneValidator } = require('../middlewares/validators/createRecipeOneValidator');
+const { createRecipeTwoValidator } = require('../middlewares/validators/createRecipeTwoValidator');
+const { createRecipeThreeValidator } = require('../middlewares/validators/createRecipeThreeValidator');
+const { createRecipeFourValidator } = require('../middlewares/validators/createRecipeFourValidator');
 const { authentication } = require('../middlewares/Auth/authentication');
 
 const {
@@ -19,11 +19,11 @@ const {
 
 const router = express.Router();
 
-router.post('/', authentication, createRecipeOne);
-router.put('/steptwo/:id', authentication, createRecipeTwo);
-router.put('/stepthree/:id', authentication, createRecipeThree);
-router.put('/stepfour/:id', authentication, createRecipeFour);
-router.get('/filter', authentication, getAllRecipe);
+router.post('/', createRecipeOneValidator, authentication, createRecipeOne);
+router.put('/steptwo/:id', createRecipeTwoValidator, authentication, createRecipeTwo);
+router.put('/stepthree/:id', createRecipeThreeValidator, authentication, createRecipeThree);
+router.put('/stepfour/:id', createRecipeFourValidator, authentication, createRecipeFour);
+router.get('/filter', authentication, getAllRecipeFiltered);
 router.get('/', authentication, getAllRecipe);
 router.get('/:id', authentication, getDetailRecipe);
 router.put('/:id', authentication, updateRecipe);

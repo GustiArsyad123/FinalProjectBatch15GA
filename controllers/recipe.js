@@ -1,4 +1,5 @@
-const { category, user, type, ingredient, recipe } = require("../models");
+const { category, user, type, recipe } = require("../models");
+const { Op } = require('sequelize')
 
 class Recipe {
    async createRecipeOne(req, res, next) {
@@ -19,7 +20,6 @@ class Recipe {
 
       res.status(201).json({ success: true, message: ["Create recipe Success!!"] });
     } catch (error) {
-        console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
@@ -40,12 +40,15 @@ class Recipe {
             where: {id: req.params.id}
         })
 
-        console.log(findData.dataValues.ingredient, "<<<<<INI INGREDIENT");
         let beforeIngredient = findData.dataValues.ingredient
-        console.log(beforeIngredient);
+
         let bahan = []
 
-        let addIngredient = bahan.push( beforeIngredient + '\n' + `${amount} ${unit} ${label}.`)
+        if (beforeIngredient != null) {
+            bahan.push( beforeIngredient + '\n' + `${amount} ${unit} ${label}.`)
+        } else {
+            bahan.push(`${amount} ${unit} ${label}.`)
+        }
 
         const updatedData = await recipe.update({
             ingredient: bahan
@@ -126,12 +129,14 @@ class Recipe {
 
    async getAllRecipeFiltered(req, res, next) {
     try {
-        let { page = 1, limit = 6, cat, type } = req.query
+        let { page = 1, limit = 6, cat = 1, type = 1, orders = 'createdAt', sort = 'ASC' } = req.query
 
         const data = await recipe.findAll({
             where: {
-                id_category: +cat,
-                id_type: +type
+                [Op.or]: {
+                    id_category: cat,
+                    id_type: type
+                }
             },
             attributes: {
                 exclude: ["createdAt","updatedAt","deletedAt",],
@@ -139,29 +144,36 @@ class Recipe {
             include: [
                 {
                     model: user,
-                    attributes: ["firstName", "lastName"],
+                    attributes: ["userName"],
                 },
                 {
                     model: category,
                     attributes: ["name"],
                 },
-                {
-                    model: type,
-                    attributes: ["name"],
-                },
+                // {
+                //     model: type,
+                //     attributes: ["name"]
+                // }
             ],      
-            order: [['createdAt', 'DESC']],
+            order: [[orders || 'createdAt', sort || 'DESC']],
             limit: +limit,
             offset: ( +page - 1 ) * parseInt(limit)
         })
 
+        if (data == null) {
+            return res.status(404).json({ success: false, errors: ["Recipe not found"]})
+         }
+
+        res.status(200).json({ success: true, data: data });
     } catch (error) {
+        console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
    async getAllRecipe(req, res, next) {
     try {
+        let { page = 1, limit = 6 } = req.query
         const userId = req.userData.id;
         const checkUser = await user.findOne({
             where: { id: userId },
@@ -174,7 +186,24 @@ class Recipe {
         const data = await recipe.findAll({
             attributes: {
                 exclude: ["createdAt", "deletedAt", "updatedAt"]
-            }
+            },
+            include: [
+                {
+                    model: user,
+                    attributes: ["userName"],
+                },
+                {
+                    model: category,
+                    attributes: ["name"],
+                },
+                {
+                    model: type,
+                    attributes: ["name"]
+                }
+            ],   
+            order: [['createdAt', 'DESC']],
+            limit: +limit,
+            offset: ( +page - 1 ) * parseInt(limit)
         })
 
         if (data == null) {
@@ -200,6 +229,23 @@ class Recipe {
         
         const data = await recipe.findOne({
             where: { id: req.params.id },
+            attributes: {
+                exclude: ["createdAt", "deletedAt", "updatedAt"]
+            },
+            include: [
+                {
+                    model: user,
+                    attributes: ["userName"],
+                },
+                {
+                    model: category,
+                    attributes: ["name"],
+                },
+                {
+                    model: type,
+                    attributes: ["name"]
+                }
+            ],   
         })
 
         if(data == null) {

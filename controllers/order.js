@@ -1,17 +1,10 @@
-const {
-  order,
-  user,
-  recipe,
-  type,
-  category,
-  ingredient,
-} = require("../models");
+const { order, user, recipe, type, category } = require("../models");
 
 class Order {
-  //get all Order
-  static async getAllOrders(req, res, next) {
+
+  async getAllOrders(req, res, next) {
     try {
-      // filtering
+
       let filter = {};
       if (req.query.minTotal) {
         filter.total = { $gte: parseInt(req.query.minTotal) };
@@ -23,7 +16,6 @@ class Order {
         filter["order.name"] = { $regex: req.query.orderName, $options: "i" };
       }
 
-      // Find all order
       let data = await order.find(filter).populate({ path: "order" });
 
       if (data.length === 0) {
@@ -36,9 +28,9 @@ class Order {
     }
   }
 
-  static async getDetailOrder(req, res, next) {
+ async getDetailOrder(req, res, next) {
     try {
-      // Find order by req.params.id
+  
       let data = await order
         .findOne({ _id: req.params.id })
         .populate({ path: "order" });
@@ -53,9 +45,9 @@ class Order {
     }
   }
 
-  static async createOrder(req, res, next) {
+async createOrder(req, res, next) {
     try {
-      // Create Order
+
       const newData = await order.create({
         quantity: req.body.quantity,
         subtotal: req.body.subtotal,
@@ -64,7 +56,6 @@ class Order {
         total: DataTypes.total,
       });
 
-      // Find Data Order
       const data = await order.findOne({
         where: {
           id: newData.id,
@@ -89,9 +80,9 @@ class Order {
     }
   }
 
-  static async updateOrder(req, res, next) {
+async updateOrder(req, res, next) {
     try {
-      // Update data
+
       let data = await order
         .findOneAndUpdate(
           { _id: req.params.id },
@@ -116,7 +107,7 @@ class Order {
     }
   }
 
-  static async deleteOrder(req, res, next) {
+  async deleteOrder(req, res, next) {
     try {
       const deleteId = await order.findOne({
         where: { id: req.params.id },
@@ -142,4 +133,4 @@ class Order {
   }
 }
 
-module.exports = Order;
+module.exports = new Order();
