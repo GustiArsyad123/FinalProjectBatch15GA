@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       id_recipe: DataTypes.INTEGER,
       id_category: DataTypes.INTEGER,
       id_type: DataTypes.INTEGER,
-      comment: DataTypes.STRING,
+      comment: DataTypes.TEXT,
     },
     {
       sequelize,

@@ -42,15 +42,15 @@ module.exports = {
       },
       description: {
         allowNull: true,
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       direction: {
         allowNull: true,
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       ingredient: {
         allowNull: true,
-        type: Sequelize.STRING
+        type: Sequelize.JSONB
       },
       stock: {
         allowNull: true,
@@ -81,7 +81,7 @@ module.exports = {
     await queryInterface.addConstraint('recipes', {
       fields: ['id_category'],
       type: 'foreign key',
-      name: 'custom_fkey_id_categoryRecipe',
+      name: 'custom_fkey_id_catRecipe',
       references: {
         //Required field
         table: 'categories',
