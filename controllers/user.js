@@ -10,7 +10,7 @@ class User {
       const data = await user.findOne({
         where: { id: +userId },
         attributes: {
-          exclude: ["createdAt", "updatedAt", "deletedAt"],
+          exclude: ["password", "createdAt", "updatedAt", "deletedAt"],
         },
       });
 
@@ -36,7 +36,7 @@ class User {
             email: email,
           },
           attributes: {
-            exclude: ["createdAt", "updatedAt", "deletedAt"],
+            exclude: ["password", "createdAt", "updatedAt", "deletedAt"],
           }
         })
 

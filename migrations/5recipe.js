@@ -118,6 +118,7 @@ module.exports = {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       });
+
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('recipes');

@@ -13,6 +13,7 @@ const {
     getAllRecipeFiltered,
     getAllRecipe,
     getDetailRecipe,
+    searchRecipe,
     updateRecipe,
     deleteRecipe
 } = require('../controllers/recipe');
@@ -24,6 +25,7 @@ router.put('/steptwo/:id', createRecipeTwoValidator, authentication, createRecip
 router.put('/stepthree/:id', createRecipeThreeValidator, authentication, createRecipeThree);
 router.put('/stepfour/:id', createRecipeFourValidator, authentication, createRecipeFour);
 router.get('/filter', authentication, getAllRecipeFiltered);
+router.get('/search', authentication, searchRecipe);
 router.get('/', authentication, getAllRecipe);
 router.get('/:id', authentication, getDetailRecipe);
 router.put('/:id', authentication, updateRecipe);
