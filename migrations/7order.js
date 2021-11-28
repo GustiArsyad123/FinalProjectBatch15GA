@@ -24,6 +24,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER
       },
+      id_delivery: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
       quantity: {
         allowNull: true,
         type: Sequelize.INTEGER
@@ -99,7 +103,7 @@ module.exports = {
         onUpdate: 'cascade',
       });
 
-          // id_recipe foreign key
+     // id_recipe foreign key
     await queryInterface.addConstraint('orders', {
         fields: ['id_recipe'],
         type: 'foreign key',
@@ -112,6 +116,20 @@ module.exports = {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       });
+
+     // id_delivery foreign key
+    await queryInterface.addConstraint('orders', {
+      fields: ['id_delivery'],
+      type: 'foreign key',
+      name: 'custom_fkey_id_deliveryOrder',
+      references: {
+        //Required field
+        table: 'deliveries',
+        field: 'id',
+      },
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    });
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('orders');

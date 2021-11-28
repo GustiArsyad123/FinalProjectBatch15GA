@@ -1,14 +1,24 @@
-const express = require("express");
-const { authentication } = require("../middlewares/Auth/authentication");
+const express = require('express');
+// const { createRecipeOneValidator } = require('../middlewares/validators/createRecipeOneValidator');
+// const { createRecipeTwoValidator } = require('../middlewares/validators/createRecipeTwoValidator');
+// const { createRecipeThreeValidator } = require('../middlewares/validators/createRecipeThreeValidator');
+// const { createRecipeFourValidator } = require('../middlewares/validators/createRecipeFourValidator');
+const { authentication } = require('../middlewares/Auth/authentication');
 
-const { createReview, getAllreview, getDetailReview, updateReview, deleteReview } = require("../controllers/review");
+const {
+    createReview,
+    getAllreview,
+    getDetailReview,
+    updateReview,
+    deleteReview
+} = require('../controllers/review');
 
 const router = express.Router();
 
-router.post("/", authentication, createReview);
-router.get("/", getAllreview);
-router.get("/:id", authentication, getDetailReview);
-router.put("/:id", authentication, updateReview);
-router.delete("/:id", authentication, deleteReview);
+router.post('/:idRecipe', authentication, createReview);
+router.get('/:idRecipe', authentication, getAllreview);
+router.get('/:idRecipe/:idReview', authentication, getDetailReview);
+router.put('/:idRecipe/:idReview', authentication, updateReview);
+router.delete('/:idRecipe/:idReview', authentication, deleteReview);
 
-module.exports = router;
+module.exports = router; 

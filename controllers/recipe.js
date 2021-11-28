@@ -1,4 +1,4 @@
-const { category, user, type, recipe } = require("../models");
+const { category, user, type, recipe, review } = require("../models");
 const { Op } = require("sequelize");
 
 class Recipe {
@@ -293,27 +293,6 @@ class Recipe {
       const checkUser = await user.findOne({
         where: { id: userId },
       });
-      const comment = await review.findAll({
-        include: [{ model: user, attributes: ["firstName", "image"] }],
-        where: { eventId: data.id },
-      });
-      comments.afterFind((instance) => {
-        if (instance.length > 0) {
-          instance.forEach((el) => {
-            let waktu = new Date(el.dataValues.createdAt).toLocaleString(
-              "en-US",
-              {
-                timeZone: "Asia/Jakarta",
-              }
-            );
-
-            el.dataValues.commentTime = moment(
-              waktu,
-              "MM/DD/YYYY hh:mm:ss A"
-            ).fromNow();
-          });
-        }
-      });
 
       if (checkUser.id !== userId) {
         return res.status(401).json({
@@ -340,6 +319,9 @@ class Recipe {
             model: type,
             attributes: ["name"],
           },
+          {
+            model: review,
+          },
         ],
       });
 
@@ -347,6 +329,61 @@ class Recipe {
         return res
           .status(404)
           .json({ success: false, errors: ["Recipe not found"] });
+      }
+
+      res.status(200).json({ success: true, data: data });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async searchRecipe(req, res, next) {
+    try {
+      const { keyword } = req.query;
+      const userId = req.userData.id;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to delete it."],
+        });
+      }
+
+      const data = await recipe.findAll({
+        where: {
+          title: {
+            [Op.iLike]: `%${keyword}%`,
+          },
+        },
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"],
+        },
+        include: [
+          {
+            model: user,
+            attributes: ["userName"],
+          },
+          {
+            model: category,
+            attributes: ["name"],
+          },
+          {
+            model: type,
+            attributes: ["name"],
+          },
+        ],
+      });
+
+      if (data == null) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Recipe is not found"] });
       }
 
       res.status(200).json({ success: true, data: data });
@@ -419,10 +456,6 @@ class Recipe {
           {
             model: type,
             attributes: ["name"],
-          },
-          {
-            model: ingredient,
-            attributes: ["name", "price", "unit", "stock"],
           },
         ],
       });
