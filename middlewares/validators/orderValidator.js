@@ -5,6 +5,35 @@ const validator = require("validator");
 const { promisify } = require("util");
 // const { category } = require("../../models");
 
+exports.orderUpdateDeliveryValidator = async (req, res, next) => {
+  try {
+    const errors = [];
+
+    if (validator.isEmpty(req.body.firstName, { ignore_whitespace: false })) {
+      errors.push("Please Check Your Delivery First Name, it cannot be empty ");
+    }
+    if (validator.isEmpty(req.body.lastName, { ignore_whitespace: false })) {
+      errors.push("Please Check Your Delivery Last Name, it cannot be empty ");
+    }
+    if (
+      !validator.isNumeric(req.body.phoneNumber, { ignore_whitespace: false })
+    ) {
+      errors.push("Input Only Number");
+    }
+    if (validator.isEmpty(req.body.address, { ignore_whitespace: false })) {
+      errors.push("Please Check Your Delivery Address, it cannot be empty ");
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, errors: errors });
+    }
+
+    next();
+  } catch (error) {
+    res.status(401).json({ success: false, errors: ["Bad request"] });
+  }
+};
+
 exports.orderValidator = async (req, res, next) => {
   try {
     const errors = [];
