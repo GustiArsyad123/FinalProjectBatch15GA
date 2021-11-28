@@ -1,5 +1,6 @@
 const { category, user, type, recipe, review } = require("../models");
 const { Op } = require("sequelize");
+const moment = require("moment");
 
 class Recipe {
   async createRecipeOne(req, res, next) {
@@ -294,6 +295,31 @@ class Recipe {
         where: { id: userId },
       });
 
+      const comment = await review.findAll({
+        include: [{ model: user, attributes: ["userName", "image"] }],
+        where: { id_recipe: req.params.id },
+        attributes: {
+          include: ["comment"],
+        },
+      });
+      review.afterFind((instance) => {
+        if (instance.length > 0) {
+          instance.forEach((el) => {
+            let waktu = new Date(el.dataValues.createdAt).toLocaleString(
+              "en-US",
+              {
+                timeZone: "Asia/Jakarta",
+              }
+            );
+
+            el.dataValues.commentTime = moment(
+              waktu,
+              "MM/DD/YYYY hh:mm:ss A"
+            ).fromNow();
+          });
+        }
+      });
+
       if (checkUser.id !== userId) {
         return res.status(401).json({
           success: false,
@@ -319,9 +345,9 @@ class Recipe {
             model: type,
             attributes: ["name"],
           },
-          {
-            model: review,
-          },
+          //   {
+          //     model: review,
+          //   },
         ],
       });
 
@@ -331,7 +357,7 @@ class Recipe {
           .json({ success: false, errors: ["Recipe not found"] });
       }
 
-      res.status(200).json({ success: true, data: data });
+      res.status(200).json({ success: true, data: data, comment });
     } catch (error) {
       console.log(error);
       res
