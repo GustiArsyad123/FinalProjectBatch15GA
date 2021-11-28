@@ -3,32 +3,11 @@ const crypto = require("crypto");
 const cloudinary = require("cloudinary").v2;
 const validator = require("validator");
 const { promisify } = require("util");
+const { category } = require("../../models");
 
-exports.signUpCompleteValidator = async (req, res, next) => {
+exports.createDeskriptValidator = async (req, res, next) => {
   try {
     const errors = [];
-
-    if (
-      validator.isNumeric(req.body.phoneNumber, { ignore_whitespace: false })
-    ) {
-      errors.push("Input Only Number");
-    }
-    if (validator.isEmpty(req.body.phoneNumber, { ignore_whitespace: false })) {
-      errors.push("Please enter your phone number");
-    }
-    // if (!validator.isNumeric(req.body.phoneNumber)) {
-    //   errors.push("Phone number must be number");
-    // }
-    if (validator.isEmpty(req.body.address, { ignore_whitespace: false })) {
-      errors.push("Please input your address");
-    }
-    if (validator.isEmpty(req.body.location, { ignore_whitespace: false })) {
-      errors.push("Please input your location(city)");
-    }
-
-    if (errors.length > 0) {
-      return res.status(400).json({ success: false, errors: errors });
-    }
 
     if (req.files.image) {
       const file = req.files.image;
@@ -66,9 +45,36 @@ exports.signUpCompleteValidator = async (req, res, next) => {
       errors.push("Please insert your picture");
     }
 
+    if (validator.isEmpty(req.body.title, { ignore_whitespace: false })) {
+      errors.push("Please fill the title");
+    }
+    // if (!validator.isNumeric(req.body.phoneNumber)) {
+    //   errors.push("Phone number must be number");
+    // }
+    if (validator.isEmpty(req.body.duration, { ignore_whitespace: false })) {
+      errors.push("Please fill the duration");
+    }
+    const checkCategory = await category.findOne({
+      where: {
+        email: req.body.category,
+      },
+    });
+    if (checkCategory != null) {
+      errors.push("Pleas Choose The Category");
+    }
+    if (validator.isEmpty(req.body.serving, { ignore_whitespace: false })) {
+      errors.push("Please fill How to serving");
+    }
+    if (validator.isEmpty(req.body.description, { ignore_whitespace: false })) {
+      errors.push("Please fill description");
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, errors: errors });
+    }
+
     next();
   } catch (error) {
-    console.log(error);
     res.status(401).json({ success: false, errors: ["Bad request"] });
   }
 };
