@@ -5,10 +5,10 @@ const { createDelivery, getAllDelivery, getDetailDelivery, updateDelivery, delet
 
 const router = express.Router();
 
-router.post("/delivery/create", authentication, createDelivery);
-router.get("/delivery", authentication, getAllDelivery);
-router.get("/delivery/:id", authentication, getDetailDelivery);
-router.put("/delivery/update", authentication, updateDelivery);
-router.delete("/delivery/delete/:id", authentication, deleteDelivery);
+router.post("/", authentication, createDelivery);
+router.get("/", authentication, getAllDelivery);
+router.get("/:id", authentication, getDetailDelivery);
+router.put("/:id", authentication, updateDelivery);
+router.delete("/:id", authentication, deleteDelivery);
 
 module.exports = router;

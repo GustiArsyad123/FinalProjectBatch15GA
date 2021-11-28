@@ -5,10 +5,10 @@ const { createReview, getAllreview, getDetailReview, updateReview, deleteReview 
 
 const router = express.Router();
 
-router.post("/review/create", authentication, createReview);
-router.get("/review", getAllreview);
-router.get("/review/:id", authentication, getDetailReview);
-router.put("/review/update", authentication, updateReview);
-router.delete("/review/delete/:id", authentication, deleteReview);
+router.post("/", authentication, createReview);
+router.get("/", getAllreview);
+router.get("/:id", authentication, getDetailReview);
+router.put("/:id", authentication, updateReview);
+router.delete("/:id", authentication, deleteReview);
 
 module.exports = router;
