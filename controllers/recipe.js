@@ -295,17 +295,25 @@ class Recipe {
         where: { id: userId },
       });
 
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to delete it."],
+        });
+      }
+
       const comment = await review.findAll({
         include: [{ model: user, attributes: ["userName", "image"] }],
         where: { id_recipe: req.params.id },
         attributes: {
           include: ["comment"],
+          exclude: ["deletedAt"]
         },
       });
-      review.afterFind((instance) => {
+      await review.afterFind((instance) => {
         if (instance.length > 0) {
           instance.forEach((el) => {
-            let waktu = new Date(el.dataValues.createdAt).toLocaleString(
+            let waktu = new Date(el.dataValues.updatedAt).toLocaleString(
               "en-US",
               {
                 timeZone: "Asia/Jakarta",
@@ -320,12 +328,6 @@ class Recipe {
         }
       });
 
-      if (checkUser.id !== userId) {
-        return res.status(401).json({
-          success: false,
-          errors: ["You must have permission to delete it."],
-        });
-      }
 
       const data = await recipe.findOne({
         where: { id: req.params.id },
@@ -406,7 +408,7 @@ class Recipe {
         ],
       });
 
-      if (data == null) {
+      if (data.length == 0) {
         return res
           .status(404)
           .json({ success: false, errors: ["Recipe is not found"] });

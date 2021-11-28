@@ -1,134 +1,520 @@
-const { order, user, recipe, type, category } = require("../models");
+const { category, user, type, recipe, review, order } = require("../models");
 
 class Order {
-
-  async getAllOrders(req, res, next) {
+  async createPayment(req, res, next) {
     try {
-
-      let filter = {};
-      if (req.query.minTotal) {
-        filter.total = { $gte: parseInt(req.query.minTotal) };
-      }
-      if (req.query.maxTotal) {
-        filter.total = { ...filter.total, $lte: parseInt(req.query.maxTotal) };
-      }
-      if (req.query.orderName) {
-        filter["order.name"] = { $regex: req.query.orderName, $options: "i" };
-      }
-
-      let data = await order.find(filter).populate({ path: "order" });
-
-      if (data.length === 0) {
-        return next({ message: "Order not found", statusCode: 404 });
-      }
-
-      res.status(200).json({ data });
-    } catch (error) {
-      next(error);
-    }
-  }
-
- async getDetailOrder(req, res, next) {
-    try {
-  
-      let data = await order
-        .findOne({ _id: req.params.id })
-        .populate({ path: "order" });
-
-      if (!data) {
-        return next({ message: "Order not found", statusCode: 404 });
-      }
-
-      res.status(200).json({ data });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-async createOrder(req, res, next) {
-    try {
-
-      const newData = await order.create({
-        quantity: req.body.quantity,
-        subtotal: req.body.subtotal,
-        uploadRecipe: req.body.uploadRecipe,
-        deliveryFee: DataTypes.deliveryFee,
-        total: DataTypes.total,
+      const userId = req.userData.id;
+      const { uploadReceipt } = req.body;
+      const checkUser = await user.findOne({
+        where: { id: userId },
       });
 
-      const data = await order.findOne({
+      if (checkUser.id != userId) {
+        return res.status(401).json({
+          success: false,
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
+        });
+      }
+
+      const data = await order.create({
+        uploadReceipt
+      });
+
+      res
+        .status(201)
+        .json({ success: true, message: ["Success upload receipt!!"] });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async getCheckout(req, res, next) {
+    try {
+      const userId = req.userData.id;
+
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
+        });
+      }
+
+      const userData = await user.findOne({
+        where: { id: +userId },
+        attributes: {
+          include: ["firstName", "lastName", "address", "phoneNumber"]
+        }
+      });
+
+
+      const recipeData = await recipe.findAndCountAll(
+        {
+          where: { id: req.params.id },
+        }
+      );
+
+      if (updatedData[0] === 0) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["recipe not found"] });
+      }
+
+      res
+        .status(201)
+        .json({ success: true, message: ["Success update your recipe"] });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async createRecipeThree(req, res, next) {
+    try {
+      const userId = req.userData.id;
+      const { direction } = req.body;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id != userId) {
+        return res.status(401).json({
+          success: false,
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
+        });
+      }
+
+      const updatedData = await recipe.update(
+        {
+          direction,
+        },
+        {
+          where: { id: req.params.id },
+        }
+      );
+
+      if (updatedData[0] == 0) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["recipe not found"] });
+      }
+
+      res
+        .status(201)
+        .json({ success: true, message: ["Success update your recipe"] });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async createRecipeFour(req, res, next) {
+    try {
+      const userId = req.userData.id;
+      const { price, stock, location } = req.body;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id != userId) {
+        return res.status(401).json({
+          success: false,
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
+        });
+      }
+
+      const updatedData = await recipe.update(
+        {
+          price,
+          stock,
+          location,
+        },
+        {
+          where: { id: req.params.id },
+        }
+      );
+
+      if (updatedData[0] == 0) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["recipe not found"] });
+      }
+
+      res
+        .status(201)
+        .json({ success: true, message: ["Success update your recipe"] });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async getAllRecipeFiltered(req, res, next) {
+    try {
+      let {
+        page = 1,
+        limit = 6,
+        cat = 1,
+        type = 1,
+        orders = "createdAt",
+        sort = "ASC",
+      } = req.query;
+
+      const data = await recipe.findAll({
         where: {
-          id: newData.id,
+          [Op.or]: {
+            id_category: cat,
+            id_type: type,
+          },
         },
         attributes: {
-          exclude: ["createdAt", "updatedAt"],
+          exclude: ["createdAt", "updatedAt", "deletedAt"],
         },
         include: [
           {
             model: user,
-            recipe,
-            type,
-            category,
-            ingredient,
+            attributes: ["userName"],
+          },
+          {
+            model: category,
+            attributes: ["name"],
+          },
+          // {
+          //     model: type,
+          //     attributes: ["name"]
+          // }
+        ],
+        order: [[orders || "createdAt", sort || "DESC"]],
+        limit: +limit,
+        offset: (+page - 1) * parseInt(limit),
+      });
+
+      if (data == null) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Recipe not found"] });
+      }
+
+      res.status(200).json({ success: true, data: data });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async getAllRecipe(req, res, next) {
+    try {
+      let { page = 1, limit = 6 } = req.query;
+      const userId = req.userData.id;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to delete it."],
+        });
+      }
+
+      const data = await recipe.findAll({
+        attributes: {
+          exclude: ["createdAt", "deletedAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: user,
+            attributes: ["userName"],
+          },
+          {
+            model: category,
+            attributes: ["name"],
+          },
+          {
+            model: type,
+            attributes: ["name"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+        limit: +limit,
+        offset: (+page - 1) * parseInt(limit),
+      });
+
+      if (data == null) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Recipe not found"] });
+      }
+
+      res.status(200).json({ success: true, data: data });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async getDetailRecipe(req, res, next) {
+    try {
+      const userId = req.userData.id;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to delete it."],
+        });
+      }
+
+      const comment = await review.findAll({
+        include: [{ model: user, attributes: ["userName", "image"] }],
+        where: { id_recipe: req.params.id },
+        attributes: {
+          include: ["comment"],
+          exclude: ["deletedAt"]
+        },
+      });
+      await review.afterFind((instance) => {
+        if (instance.length > 0) {
+          instance.forEach((el) => {
+            let waktu = new Date(el.dataValues.updatedAt).toLocaleString(
+              "en-US",
+              {
+                timeZone: "Asia/Jakarta",
+              }
+            );
+
+            el.dataValues.commentTime = moment(
+              waktu,
+              "MM/DD/YYYY hh:mm:ss A"
+            ).fromNow();
+          });
+        }
+      });
+
+
+      const data = await recipe.findOne({
+        where: { id: req.params.id },
+        attributes: {
+          exclude: ["createdAt", "deletedAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: user,
+            attributes: ["userName"],
+          },
+          {
+            model: category,
+            attributes: ["name"],
+          },
+          {
+            model: type,
+            attributes: ["name"],
+          },
+          //   {
+          //     model: review,
+          //   },
+        ],
+      });
+
+      if (data == null) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Recipe not found"] });
+      }
+
+      res.status(200).json({ success: true, data: data, comment });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async searchRecipe(req, res, next) {
+    try {
+      const { keyword } = req.query;
+      const userId = req.userData.id;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to delete it."],
+        });
+      }
+
+      const data = await recipe.findAll({
+        where: {
+          title: {
+            [Op.iLike]: `%${keyword}%`,
+          },
+        },
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"],
+        },
+        include: [
+          {
+            model: user,
+            attributes: ["userName"],
+          },
+          {
+            model: category,
+            attributes: ["name"],
+          },
+          {
+            model: type,
+            attributes: ["name"],
           },
         ],
       });
 
-      res.status(201).json({ data, message: ["Success Add The Ingredient"] });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-async updateOrder(req, res, next) {
-    try {
-
-      let data = await order
-        .findOneAndUpdate(
-          { _id: req.params.id },
-          req.body, // This is all of req.body
-          { new: true }
-        )
-        .populate({ path: "recipe" });
-      // new is to return the updated order data
-      // If no new, it will return the old data before updated
-
-      if (!data) {
-        return next({ message: "Order not found", statusCode: 404 });
+      if (data.length == 0) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Recipe is not found"] });
       }
 
-      // Add more detail data of recipe user
-      data.recipe.user = await user.findOne({ _id: data.recipe.user });
-
-      // If success
-      return res.status(201).json({ data });
+      res.status(200).json({ success: true, data: data });
     } catch (error) {
-      next(error);
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
-  async deleteOrder(req, res, next) {
+  async updateRecipe(req, res, next) {
     try {
-      const deleteId = await order.findOne({
-        where: { id: req.params.id },
+      const userId = req.userData.id;
+      const {
+        id_category,
+        id_type,
+        id_ingredient,
+        title,
+        duration,
+        serving,
+        image,
+        description,
+        direction,
+      } = req.body;
+      const checkUser = await user.findOne({
+        where: { id: userId },
       });
 
-      if (deleteId.userId !== req.userData.id) {
-        return res
-          .status(401)
-          .json({ errors: ["You do not have permission to access this!"] });
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
+        });
       }
-      let data = await order.destroy({ where: { id: req.params.id } });
+
+      const updatedData = await recipe.update({
+        id_category,
+        id_type,
+        id_ingredient,
+        title,
+        duration,
+        serving,
+        image,
+        description,
+        direction,
+      });
+
+      if (updatedData[0] === 0) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["recipe not found"] });
+      }
+
+      const data = await recipe.findOne({
+        where: { id: req.params.id },
+        attributes: {
+          exclude: ["cretedAt", "updatedAt", "deletedAt"],
+        },
+        include: [
+          {
+            model: category,
+            attributes: ["name"],
+          },
+          {
+            model: user,
+            attributes: ["username"],
+          },
+          {
+            model: type,
+            attributes: ["name"],
+          },
+        ],
+      });
+
+      res.status(201).json({
+        success: true,
+        message: ["Success update your recipe"],
+        data: data,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async deleteRecipe(req, res, next) {
+    try {
+      const userId = req.userData.id;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to delete it."],
+        });
+      }
+
+      let data = await recipe.destroy({ where: { id: req.params.id } });
 
       if (!data) {
-        return res.status(404).json({ errors: ["Order not found"] });
+        return res
+          .status(404)
+          .json({ success: false, errors: ["recipe not found"] });
       }
 
       res
-        .status(200)
-        .json({ data: data, message: ["Success delete your Order!"] });
+        .status(201)
+        .json({ success: true, message: ["Success delete your Recipe"] });
     } catch (error) {
-      res.status(500).json({ errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 }

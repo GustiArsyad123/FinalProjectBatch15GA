@@ -1,8 +1,5 @@
 const express = require('express');
-// const { createRecipeOneValidator } = require('../middlewares/validators/createRecipeOneValidator');
-// const { createRecipeTwoValidator } = require('../middlewares/validators/createRecipeTwoValidator');
-// const { createRecipeThreeValidator } = require('../middlewares/validators/createRecipeThreeValidator');
-// const { createRecipeFourValidator } = require('../middlewares/validators/createRecipeFourValidator');
+const { createOrUpdateReviewValidator } = require('../middlewares/validators/createOrUpdateReviewValidator');
 const { authentication } = require('../middlewares/Auth/authentication');
 
 const {
@@ -15,10 +12,10 @@ const {
 
 const router = express.Router();
 
-router.post('/:idRecipe', authentication, createReview);
+router.post('/:idRecipe', createOrUpdateReviewValidator, authentication, createReview);
 router.get('/:idRecipe', authentication, getAllreview);
 router.get('/:idRecipe/:idReview', authentication, getDetailReview);
-router.put('/:idRecipe/:idReview', authentication, updateReview);
+router.put('/:idRecipe/:idReview', createOrUpdateReviewValidator, authentication, updateReview);
 router.delete('/:idRecipe/:idReview', authentication, deleteReview);
 
 module.exports = router; 
