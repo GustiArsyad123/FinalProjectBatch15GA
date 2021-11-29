@@ -60,10 +60,14 @@ module.exports = {
         allowNull: true,
         type: Sequelize.INTEGER
       },
-      location: {
+      id_location: {
+        type: Sequelize.INTEGER,
         allowNull: true,
-        type: Sequelize.STRING
       },
+      // location: {
+      //   allowNull: true,
+      //   type: Sequelize.STRING
+      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -81,7 +85,7 @@ module.exports = {
     await queryInterface.addConstraint('recipes', {
       fields: ['id_category'],
       type: 'foreign key',
-      name: 'custom_fkey_id_catRecipe',
+      name: 'custom_fkey_id_catfdfRecipe',
       references: {
         //Required field
         table: 'categories',
@@ -95,7 +99,7 @@ module.exports = {
     await queryInterface.addConstraint('recipes', {
       fields: ['id_user'],
       type: 'foreign key',
-      name: 'custom_fkey_id_userRecipe',
+      name: 'custom_fkey_id_usefdfrRecipe',
       references: {
         //Required field
         table: 'users',
@@ -109,7 +113,7 @@ module.exports = {
     await queryInterface.addConstraint('recipes', {
         fields: ['id_type'],
         type: 'foreign key',
-        name: 'custom_fkey_id_typeRecipe',
+        name: 'custom_fkey_id_typdfdeRecipe',
         references: {
           //Required field
           table: 'types',
@@ -118,6 +122,20 @@ module.exports = {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       });
+
+          // id_location foreign key
+    await queryInterface.addConstraint('recipes', {
+      fields: ['id_location'],
+      type: 'foreign key',
+      name: 'custom_fkey_id_locadfdftionRecipe',
+      references: {
+        //Required field
+        table: 'locations',
+        field: 'id',
+      },
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    });
 
   },
   down: async (queryInterface, Sequelize) => {

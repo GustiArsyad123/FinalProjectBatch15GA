@@ -1,5 +1,4 @@
 const { review, category, user, type, recipe } = require("../models");
-const moment = require("moment");
 
 class Review {
   async getAllreview(req, res, next) {
@@ -20,7 +19,7 @@ class Review {
           id_recipe: +idRecipe
         },
         attributes: {
-          exclude: ["updatedAt", "deletedAt"],
+          exclude: ["deletedAt"],
         },
         include: [
           {
@@ -38,7 +37,7 @@ class Review {
           {
               model: type,
               attributes: ["name"]
-          }
+          },
       ],   
         order: [['id', 'DESC']]
       });
@@ -128,7 +127,7 @@ class Review {
           {
               model: type,
               attributes: ["name"]
-          }
+          },
       ],  
       });
 

@@ -1,8 +1,7 @@
-const { user, location } = require("../models");
-const { createToken, encodePin, compare } = require("../utils/index")
-const sequelize = require("sequelize")
+const { user, cart, recipe } = require("../models");
 
-class User {
+
+class Cart {
 
   async getDetailUser(req, res, next) {
     try {
@@ -13,46 +12,35 @@ class User {
         attributes: {
           exclude: ["password", "createdAt", "updatedAt", "deletedAt"],
         },
-        include: [
-          {
-            model: location,
-            attributes: ["name"]
-          }
-        ]
       });
-
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {
-      console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
-  async createUser(req, res, next) {
+  async addCart(req, res, next) {
     try {
-      const { userName, email, password } = req.body
-      const hashPassword = encodePin(password)
-     
-        const newUser = await user.create({
-          userName,
-          email,
-          password: hashPassword,
+        const userId = req.userData.id;
+        const { idRecipe } = req.params
+        const checkUser = await user.findOne({
+          where: { id: userId },
+        });
+  
+        if (checkUser.id !== userId) {
+          return res.status(401).json({
+            success: false,
+            errors: ["You must have permission to delete it."],
+          });
+        }
+
+        await cart.create({
+            id_user: +userId,
+            id_recipe: +idRecipe
         })
 
-        const data = await user.findOne({
-          where: {
-            email: email,
-          },
-          attributes: {
-            exclude: ["password", "createdAt", "updatedAt", "deletedAt"],
-          }
-        })
-
-        const payload = {id: data.dataValues.id, userName: data.dataValues.userName, email: data.dataValues.email}
-        const token = createToken(payload)
-
-        res.status(200).json({ success: true, data: data, token: token });
+        res.status(200).json({ success: true, message: ["Success add to cart"] });
 
     } catch (error) {
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
@@ -72,12 +60,6 @@ class User {
         where: {
           id: +userId,
         },
-        include: [
-          {
-            model: location,
-            attributes: ["name"]
-          }
-        ]
       });
 
       res.status(201).json({ success: true, message: ["Success Update Data"], data: data });
@@ -205,4 +187,4 @@ class User {
   }
 }
 
-module.exports = new User();
+module.exports = new Cart();

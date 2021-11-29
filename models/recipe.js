@@ -15,12 +15,14 @@ module.exports = (sequelize, DataTypes) => {
       models.recipe.belongsTo(models.category, { foreignKey: "id_category" });
       models.recipe.belongsTo(models.user, { foreignKey: "id_user" });
       models.recipe.belongsTo(models.type, { foreignKey: "id_type" });
+      models.recipe.belongsTo(models.location, { foreignKey: "id_location" });
     }
   };
   recipe.init({
     id_category: DataTypes.INTEGER,
     id_user: DataTypes.INTEGER,
     id_type: DataTypes.INTEGER,
+    id_location: DataTypes.INTEGER,
     title: DataTypes.STRING,
     duration: DataTypes.STRING,
     serving: DataTypes.STRING,
@@ -30,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     ingredient: DataTypes.JSONB,
     stock: DataTypes.INTEGER,
     price: DataTypes.INTEGER,
-    location: DataTypes.STRING,
+    // location: DataTypes.STRING,
   }, {
     sequelize,
     paranoid: true,

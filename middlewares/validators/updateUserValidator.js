@@ -9,7 +9,8 @@ exports.updateUserValidator = async (req, res, next) => {
   try {
     const errors = [];
 
-    if (req.files.image) {
+    //CHECK IMAGE
+    if (req.files) {
       const file = req.files.image;
 
       if (!file.mimetype.startsWith("image/")) {
@@ -41,37 +42,83 @@ exports.updateUserValidator = async (req, res, next) => {
       req.body.image = image;
     }
 
-    if (req.body.image == null) {
-      errors.push("Please insert your picture");
+    //CHECK EMAIL
+    if(req.body.email){
+      if (validator.isEmpty(req.body.email, { ignore_whitespace: false })) {
+        errors.push("Please input your email");
+      }
+
+      const checkEmail = await user.findOne({
+        where: {
+          email: req.body.email,
+        },
+      });
+  
+      if (checkEmail != null) {
+        errors.push("Email was registered");
+      }
     }
 
-    const checkEmail = await user.findOne({
-      where: {
-        email: req.body.email,
-      },
-    });
+    //CHECK USERNAME
+    if(req.body.userName){
+      if (validator.isEmpty(req.body.userName, { ignore_whitespace: false })) {
+        errors.push("Please input your username");
+      }
 
-    if (checkEmail != null) {
-      errors.push("Email was registered");
+      const checkUserName = await user.findOne({
+        where: {
+          email: req.body.userName,
+        },
+      });
+  
+      if (checkUserName != null) {
+        errors.push("Username was registered");
+      }
     }
 
-    // if (!validator.isNumeric(req.body.phoneNumber)) {
-    //   errors.push("Phone number must be number");
-    // }
-    if (validator.isEmpty(req.body.firstName, { ignore_whitespace: false })) {
-      errors.push("Please input Your Name");
+    //CHECK FIRST NAME
+    if(req.body.firstName){
+      if (validator.isEmpty(req.body.firstName, { ignore_whitespace: false })) {
+        errors.push("Please input Your Name");
+      }
     }
-    if (validator.isEmpty(req.body.lastName, { ignore_whitespace: false })) {
-      errors.push("Please input your last name");
+
+    //CHECK LAST NAME
+    if(req.body.lastName){
+      if (validator.isEmpty(req.body.lastName, { ignore_whitespace: false })) {
+        errors.push("Please input your last name");
+      }
     }
-    if (validator.isEmpty(req.body.location, { ignore_whitespace: false })) {
-      errors.push("Please input your city");
+
+    //CHECK LOCATION
+    if(req.body.id_location){
+      if (validator.isEmpty(req.body.id_location, { ignore_whitespace: false })) {
+        errors.push("Please input your city");
+      }
     }
-    if (validator.isEmpty(req.body.phoneNumber, { ignore_whitespace: false })) {
-      errors.push("Please input your phone number");
+
+    //CHECK PHONE NUMBER
+    if(req.body.phoneNumber){
+      if (validator.isEmpty(req.body.phoneNumber, { ignore_whitespace: false })) {
+        errors.push("Please input your phone number");
+      }
+
+      const checkPhoneNumber = await user.findOne({
+        where: {
+          email: req.body.phoneNumber,
+        },
+      });
+  
+      if (checkPhoneNumber != null) {
+        errors.push("phone number was registered");
+      }
     }
-    if (validator.isEmpty(req.body.address, { ignore_whitespace: false })) {
-      errors.push("Please input your address");
+
+    //CHECK ADDRESS
+    if(req.body.address){
+      if (validator.isEmpty(req.body.address, { ignore_whitespace: false })) {
+        errors.push("Please input your address");
+      }
     }
 
     if (errors.length > 0) {
@@ -80,6 +127,7 @@ exports.updateUserValidator = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error);
     res.status(401).json({ success: false, errors: ["Bad request"] });
   }
 };

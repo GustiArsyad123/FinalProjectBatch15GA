@@ -12,12 +12,11 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// App id= 583376876272869;
-// app secret=58bc092f01749e0b239ec91e51976329;
-
 const user = require("./routes/user");
 const recipe = require("./routes/recipe");
 const review = require("./routes/review");
+const order = require("./routes/order");
+const cart = require("./routes/cart");
 const errorHandler = require("./middlewares/errorHandler/errorHandler");
 
 app.use(cors());
@@ -76,6 +75,8 @@ app.get("/", (req, res) => {
 app.use("/user", user);
 app.use("/recipe", recipe);
 app.use("/review", review);
+app.use("/order", order);
+app.use("/cart", cart);
 
 app.get("*", (req, res, next) => {
   res.send("404 Page Not Found");
