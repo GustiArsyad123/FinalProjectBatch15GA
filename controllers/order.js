@@ -57,7 +57,27 @@ class Order {
       const userAddress = checkUser.dataValues.address
       const userPhoneNumber = checkUser.dataValues.phoneNumber
 
+      // let getRecipe = [];
 
+      // let req = {
+      //   body: {
+      //     recipe: []
+      //   }
+      // }
+
+      // await recipe.findAll
+
+      // for(let i = 0; i < req.body.recipe.length; i++){
+      //   getRecipe.push(req.body.recipe[i].id)
+      // }
+
+      // await recipe.findAll({
+      //   where: {
+      //     id: getRecipe
+      //   }
+      // })
+
+      // console.log(getRecipe);
 
       const addDelivery = await delivery.create({
         firstName: userFirstName,
@@ -69,18 +89,36 @@ class Order {
       const getDelivery = await delivery.findOne({
         where: {
           phoneNumber: userPhoneNumber
-        }
+        },
+        attributes: {
+          exclude: ["createdAt", "deletedAt", "updatedAt"],
+      },
       })
 
 
       const cartData = await cart.findAll(
         {
-          where: { id_user: +userId },
+          where: { id_user: +userId 
+        },
           attributes: {
             exclude: ["createdAt", "deletedAt", "updatedAt"],
-        }
+        },
+        include: [
+          {
+            model: recipe,
+            attributes: ["price"],
+          },
+        ],
       }
       );
+
+      let priceRecipe = []
+      for(let i = 0; i < cartData.length; i++){
+        priceRecipe.push(cartData[i].recipe.price)
+      }
+
+      priceRecipe = priceRecipe.reduce((a, b) => a + b, 0)
+
 
       if (cartData.length == 0) {
         return res
@@ -88,23 +126,21 @@ class Order {
           .json({ success: false, errors: ["cart is empty"] });
       }
 
+      // cartData[i].price
+
       const createOrder = await order.create({
         id_user: +userId,
         id_delivery: getDelivery.dataValues.id,
         quantity: cartData.length,
-        subtotal,
+        subtotal: priceRecipe,
         deliveryFee: 15000,
-        total
+        total: priceRecipe + 15000
       })
 
-      /*
-      mie goreng 2 @15000
-      nasi goreng 3 @13000
-      */
 
       res
         .status(200)
-        .json({ success: true, user: getDelivery, cart: cartData });
+        .json({ success: true, user: getDelivery, subtotal: priceRecipe, order: createOrder, cart: cartData });
     } catch (error) {
       console.log(error);
       res
