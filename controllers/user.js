@@ -53,14 +53,8 @@ class User {
   async completeSignUp(req, res, next) {
     try {
       const userId = req.userData.id
-      const { image, phoneNumber, address, location } = req.body
-
-      const updateData = await user.update({
-        image,
-        phoneNumber,
-        address,
-        location
-      },
+ 
+      const updateData = await user.update(req.body,
       {
         where: { id: +userId },
       });
@@ -82,17 +76,8 @@ class User {
   async updateUser(req, res, next) {
     try {
       const userId = req.userData.id
-      const { firstName, lastName, email, phoneNumber, address, location, image } = req.body
 
-      const updateData = await user.update({
-        firstName,
-        lastName,
-        // email,
-        phoneNumber,
-        address,
-        location,
-        image
-      },
+      const updateData = await user.update(req.body,
       {
         where: { id: +userId },
       });

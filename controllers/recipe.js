@@ -302,33 +302,6 @@ class Recipe {
         });
       }
 
-      const comment = await review.findAll({
-        include: [{ model: user, attributes: ["userName", "image"] }],
-        where: { id_recipe: req.params.id },
-        attributes: {
-          include: ["comment"],
-          exclude: ["deletedAt"]
-        },
-      });
-      await review.afterFind((instance) => {
-        if (instance.length > 0) {
-          instance.forEach((el) => {
-            let waktu = new Date(el.dataValues.updatedAt).toLocaleString(
-              "en-US",
-              {
-                timeZone: "Asia/Jakarta",
-              }
-            );
-
-            el.dataValues.commentTime = moment(
-              waktu,
-              "MM/DD/YYYY hh:mm:ss A"
-            ).fromNow();
-          });
-        }
-      });
-
-
       const data = await recipe.findOne({
         where: { id: req.params.id },
         attributes: {
@@ -351,6 +324,33 @@ class Recipe {
           //     model: review,
           //   },
         ],
+      });
+
+      const comment = await review.findAll({
+        include: [{ model: user, attributes: ["userName", "image"] }],
+        where: { id_recipe: req.params.id },
+        attributes: {
+          include: ["comment"],
+          exclude: ["deletedAt"]
+        },
+      });
+
+      await review.afterFind((instance) => {
+        if (instance.length > 0) {
+          instance.forEach((el) => {
+            let waktu = new Date(el.dataValues.updatedAt).toLocaleString(
+              "en-US",
+              {
+                timeZone: "Asia/Jakarta",
+              }
+            );
+
+            el.dataValues.commentTime = moment(
+              waktu,
+              "MM/DD/YYYY hh:mm:ss A"
+            ).fromNow();
+          });
+        }
       });
 
       if (data == null) {

@@ -8,29 +8,43 @@ exports.signUpCompleteValidator = async (req, res, next) => {
   try {
     const errors = [];
 
-    if (
-      validator.isNumeric(req.body.phoneNumber, { ignore_whitespace: false })
-    ) {
-      errors.push("Input Only Number");
+    //CHECK LOCATION
+    if(req.body.location){
+      if (validator.isEmpty(req.body.location, { ignore_whitespace: false })) {
+        errors.push("Please input your city");
+      }
     }
-    if (validator.isEmpty(req.body.phoneNumber, { ignore_whitespace: false })) {
-      errors.push("Please enter your phone number");
+
+    //CHECK PHONE NUMBER
+    if(req.body.phoneNumber){
+      if (validator.isEmpty(req.body.phoneNumber, { ignore_whitespace: false })) {
+        errors.push("Please input your phone number");
+      }
+
+      const checkPhoneNumber = await user.findOne({
+        where: {
+          email: req.body.phoneNumber,
+        },
+      });
+  
+      if (checkPhoneNumber != null) {
+        errors.push("phone number was registered");
+      }
     }
-    // if (!validator.isNumeric(req.body.phoneNumber)) {
-    //   errors.push("Phone number must be number");
-    // }
-    if (validator.isEmpty(req.body.address, { ignore_whitespace: false })) {
-      errors.push("Please input your address");
-    }
-    if (validator.isEmpty(req.body.location, { ignore_whitespace: false })) {
-      errors.push("Please input your location(city)");
+
+    //CHECK ADDRESS
+    if(req.body.address){
+      if (validator.isEmpty(req.body.address, { ignore_whitespace: false })) {
+        errors.push("Please input your address");
+      }
     }
 
     if (errors.length > 0) {
       return res.status(400).json({ success: false, errors: errors });
     }
 
-    if (req.files.image) {
+    //CHECK IMAGE
+    if (req.files) {
       const file = req.files.image;
 
       if (!file.mimetype.startsWith("image/")) {

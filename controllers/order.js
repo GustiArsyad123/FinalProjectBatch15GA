@@ -97,6 +97,11 @@ class Order {
         total
       })
 
+      /*
+      mie goreng 2 @15000
+      nasi goreng 3 @13000
+      */
+
       res
         .status(200)
         .json({ success: true, user: getDelivery, cart: cartData });
