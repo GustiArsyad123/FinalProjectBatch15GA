@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const cloudinary = require("cloudinary").v2;
 const validator = require("validator");
 const { promisify } = require("util");
+const { user } = require("../../models");
 
 exports.signUpCompleteValidator = async (req, res, next) => {
   try {
