@@ -1,4 +1,4 @@
-const { review, category, user, type, recipe, location } = require("../models");
+const { review, category, user, type, recipe } = require("../models");
 
 class Review {
   async getAllreview(req, res, next) {
@@ -38,10 +38,6 @@ class Review {
               model: type,
               attributes: ["name"]
           },
-          {
-            model: location,
-            attributes: ["name"]
-          }
       ],   
         order: [['id', 'DESC']]
       });
@@ -132,10 +128,6 @@ class Review {
               model: type,
               attributes: ["name"]
           },
-          {
-            model: location,
-            attributes: ["name"]
-          }
       ],  
       });
 
