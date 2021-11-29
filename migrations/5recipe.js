@@ -60,6 +60,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.INTEGER
       },
+      id_location: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       location: {
         allowNull: true,
         type: Sequelize.STRING
@@ -118,6 +122,20 @@ module.exports = {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       });
+
+          // id_type foreign key
+    await queryInterface.addConstraint('recipes', {
+      fields: ['id_location'],
+      type: 'foreign key',
+      name: 'custom_fkey_id_locationRecipe',
+      references: {
+        //Required field
+        table: 'locations',
+        field: 'id',
+      },
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    });
 
   },
   down: async (queryInterface, Sequelize) => {
