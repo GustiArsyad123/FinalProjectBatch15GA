@@ -1,4 +1,4 @@
-const { review, category, user, type, recipe } = require("../models");
+const { review, category, user, type, recipe, location } = require("../models");
 
 class Review {
   async getAllreview(req, res, next) {
