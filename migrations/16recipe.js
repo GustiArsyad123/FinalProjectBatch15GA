@@ -85,7 +85,7 @@ module.exports = {
     await queryInterface.addConstraint('recipes', {
       fields: ['id_category'],
       type: 'foreign key',
-      name: 'custom_fkey_id_catRecipe',
+      name: 'custom_fkey_id_catfdfRecipe',
       references: {
         //Required field
         table: 'categories',
@@ -99,7 +99,7 @@ module.exports = {
     await queryInterface.addConstraint('recipes', {
       fields: ['id_user'],
       type: 'foreign key',
-      name: 'custom_fkey_id_userRecipe',
+      name: 'custom_fkey_id_usefdfrRecipe',
       references: {
         //Required field
         table: 'users',
@@ -113,7 +113,7 @@ module.exports = {
     await queryInterface.addConstraint('recipes', {
         fields: ['id_type'],
         type: 'foreign key',
-        name: 'custom_fkey_id_typeRecipe',
+        name: 'custom_fkey_id_typdfdeRecipe',
         references: {
           //Required field
           table: 'types',
@@ -127,7 +127,7 @@ module.exports = {
     await queryInterface.addConstraint('recipes', {
       fields: ['id_location'],
       type: 'foreign key',
-      name: 'custom_fkey_id_locationRecipe',
+      name: 'custom_fkey_id_locadfdftionRecipe',
       references: {
         //Required field
         table: 'locations',
