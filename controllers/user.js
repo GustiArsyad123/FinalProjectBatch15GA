@@ -72,6 +72,12 @@ class User {
         where: {
           id: +userId,
         },
+        include: [
+          {
+            model: location,
+            attributes: ["name"]
+          }
+        ]
       });
 
       res.status(201).json({ success: true, message: ["Success Update Data"], data: data });
