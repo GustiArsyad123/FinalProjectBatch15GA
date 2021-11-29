@@ -64,10 +64,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-      location: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
+      // location: {
+      //   allowNull: true,
+      //   type: Sequelize.STRING
+      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

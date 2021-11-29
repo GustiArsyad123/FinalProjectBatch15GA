@@ -1,4 +1,4 @@
-const { category, user, type, recipe, review } = require("../models");
+const { category, user, type, recipe, review, location } = require("../models");
 const { Op } = require("sequelize");
 const moment = require("moment");
 
@@ -268,6 +268,10 @@ class Recipe {
             model: type,
             attributes: ["name"],
           },
+          {
+            model: location,
+            attributes: ["name"]
+          }
         ],
         order: [["createdAt", "DESC"]],
         limit: +limit,
@@ -320,6 +324,10 @@ class Recipe {
             model: type,
             attributes: ["name"],
           },
+          {
+            model: location,
+            attributes: ["name"]
+          }
           //   {
           //     model: review,
           //   },
@@ -405,6 +413,10 @@ class Recipe {
             model: type,
             attributes: ["name"],
           },
+          {
+            model: location,
+            attributes: ["name"]
+          }
         ],
       });
 
@@ -485,6 +497,10 @@ class Recipe {
             model: type,
             attributes: ["name"],
           },
+          {
+            model: location,
+            attributes: ["name"]
+          }
         ],
       });
 

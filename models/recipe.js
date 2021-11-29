@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     ingredient: DataTypes.JSONB,
     stock: DataTypes.INTEGER,
     price: DataTypes.INTEGER,
-    location: DataTypes.STRING,
+    // location: DataTypes.STRING,
   }, {
     sequelize,
     paranoid: true,

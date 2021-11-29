@@ -1,5 +1,6 @@
-const { user } = require("../models");
+const { user, location } = require("../models");
 const { createToken, encodePin, compare } = require("../utils/index")
+const sequelize = require("sequelize")
 
 class User {
 
@@ -12,10 +13,18 @@ class User {
         attributes: {
           exclude: ["password", "createdAt", "updatedAt", "deletedAt"],
         },
+        include: [
+          {
+            model: location,
+            attributes: ["name"]
+          }
+        ]
       });
+
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
