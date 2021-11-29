@@ -91,8 +91,8 @@ exports.updateUserValidator = async (req, res, next) => {
     }
 
     //CHECK LOCATION
-    if(req.body.location){
-      if (validator.isEmpty(req.body.location, { ignore_whitespace: false })) {
+    if(req.body.id_location){
+      if (validator.isEmpty(req.body.id_location, { ignore_whitespace: false })) {
         errors.push("Please input your city");
       }
     }
