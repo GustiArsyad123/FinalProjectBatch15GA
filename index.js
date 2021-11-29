@@ -10,6 +10,7 @@ const port = process.env.PORT || 3000
 const user = require('./routes/user');
 const recipe = require('./routes/recipe');
 const review = require('./routes/review');
+const order = require('./routes/order');
 const errorHandler = require('./middlewares/errorHandler/errorHandler');
 
 app.use(cors());
@@ -31,6 +32,7 @@ app.get('/', (req, res) => {
 app.use('/user', user);
 app.use('/recipe', recipe);
 app.use('/review', review);
+app.use('/order', order);
 
 app.get('*', (req, res, next) => {
     res.send("404 Page Not Found");

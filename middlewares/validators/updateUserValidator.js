@@ -41,19 +41,15 @@ exports.updateUserValidator = async (req, res, next) => {
       req.body.image = image;
     }
 
-    if (req.body.image == null) {
-      errors.push("Please insert your picture");
-    }
+    // const checkEmail = await user.findOne({
+    //   where: {
+    //     email: req.body.email,
+    //   },
+    // });
 
-    const checkEmail = await user.findOne({
-      where: {
-        email: req.body.email,
-      },
-    });
-
-    if (checkEmail != null) {
-      errors.push("Email was registered");
-    }
+    // if (checkEmail != null) {
+    //   errors.push("Email was registered");
+    // }
 
     // if (!validator.isNumeric(req.body.phoneNumber)) {
     //   errors.push("Phone number must be number");
@@ -80,6 +76,7 @@ exports.updateUserValidator = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error);
     res.status(401).json({ success: false, errors: ["Bad request"] });
   }
 };

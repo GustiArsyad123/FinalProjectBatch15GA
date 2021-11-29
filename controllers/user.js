@@ -87,7 +87,7 @@ class User {
       const updateData = await user.update({
         firstName,
         lastName,
-        email,
+        // email,
         phoneNumber,
         address,
         location,

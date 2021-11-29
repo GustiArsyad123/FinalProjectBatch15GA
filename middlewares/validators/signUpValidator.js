@@ -67,7 +67,7 @@ exports.changePassword = async (req, res, next) => {
       errors.push("Password and confirm Password didn't match!");
     }
     if (!validator.isStrongPassword(req.body.password)){
-      errors.push("Password must has at least 8 characters that include at least 1 lowercase character, 1 uppercase characters, and 1 number");
+      errors.push("Password must has at least 8 characters that include at least 1 lowercase, 1 uppercase, 1 number and 1 symbol");
     }
 
     if (errors.length > 0) {

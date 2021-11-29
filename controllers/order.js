@@ -37,7 +37,10 @@ class Order {
       const userId = req.userData.id;
 
       const checkUser = await user.findOne({
-        where: { id: userId },
+        where: { id: +userId },
+        attributes: {
+          exclude: ["createdAt", "deletedAt", "updatedAt"]
+        }
       });
 
       if (checkUser.id !== userId) {
@@ -49,18 +52,12 @@ class Order {
         });
       }
 
-      const userData = await user.findOne({
-        where: { id: +userId },
-        attributes: {
-          exclude: ["createdAt", "deletedAt", "updatedAt"]
-        }
-      }
-      );
+      const userFirstName = checkUser.dataValues.firstName
+      const userLastName = checkUser.dataValues.lastName
+      const userAddress = checkUser.dataValues.address
+      const userPhoneNumber = checkUser.dataValues.phoneNumber
 
-      const userFirstName = userData.dataValues.firstName
-      const userLastName = userData.dataValues.lastName
-      const userAddress = userData.dataValues.address
-      const userPhoneNumber = userData.dataValues.phoneNumber
+
 
       const addDelivery = await delivery.create({
         firstName: userFirstName,
@@ -74,6 +71,7 @@ class Order {
           phoneNumber: userPhoneNumber
         }
       })
+
 
       const cartData = await cart.findAll(
         {
@@ -89,6 +87,15 @@ class Order {
           .status(404)
           .json({ success: false, errors: ["cart is empty"] });
       }
+
+      const createOrder = await order.create({
+        id_user: +userId,
+        id_delivery: getDelivery.dataValues.id,
+        quantity: cartData.length,
+        subtotal,
+        deliveryFee: 15000,
+        total
+      })
 
       res
         .status(200)
