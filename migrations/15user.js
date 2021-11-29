@@ -68,7 +68,7 @@ module.exports = {
     await queryInterface.addConstraint('users', {
       fields: ['id_location'],
       type: 'foreign key',
-      name: 'custom_fkey_id_locationRecipe',
+      name: 'custom_fkey_id_locationUser',
       references: {
         //Required field
         table: 'locations',

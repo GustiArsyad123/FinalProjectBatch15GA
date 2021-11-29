@@ -123,7 +123,7 @@ module.exports = {
         onUpdate: 'cascade',
       });
 
-          // id_type foreign key
+          // id_location foreign key
     await queryInterface.addConstraint('recipes', {
       fields: ['id_location'],
       type: 'foreign key',
