@@ -37,6 +37,10 @@ class Review {
           {
               model: type,
               attributes: ["name"]
+          },
+          {
+            model: location,
+            attributes: ["name"]
           }
       ],   
         order: [['id', 'DESC']]
@@ -127,6 +131,10 @@ class Review {
           {
               model: type,
               attributes: ["name"]
+          },
+          {
+            model: location,
+            attributes: ["name"]
           }
       ],  
       });
