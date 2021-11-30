@@ -11,7 +11,7 @@ exports.createRecipeFourValidator = async (req, res, next) => {
     if (!validator.isNumeric(req.body.stock, { ignore_whitespace: false })) {
       errors.push("Input Only Number");
     }
-    if (validator.isEmpty(req.body.location, { ignore_whitespace: false })) {
+    if (validator.isEmpty(req.body.id_location, { ignore_whitespace: false })) {
       errors.push("Please Check Your Location, it cannot be empty ");
     }
 

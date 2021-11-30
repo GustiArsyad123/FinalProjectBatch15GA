@@ -1,5 +1,6 @@
-const { user } = require("../models");
+const { user, location } = require("../models");
 const { createToken, encodePin, compare } = require("../utils/index")
+const sequelize = require("sequelize")
 
 class User {
 
@@ -12,10 +13,18 @@ class User {
         attributes: {
           exclude: ["password", "createdAt", "updatedAt", "deletedAt"],
         },
+        include: [
+          {
+            model: location,
+            attributes: ["name"]
+          }
+        ]
       });
+
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
@@ -53,14 +62,8 @@ class User {
   async completeSignUp(req, res, next) {
     try {
       const userId = req.userData.id
-      const { image, phoneNumber, address, location } = req.body
-
-      const updateData = await user.update({
-        image,
-        phoneNumber,
-        address,
-        location
-      },
+ 
+      const updateData = await user.update(req.body,
       {
         where: { id: +userId },
       });
@@ -69,6 +72,12 @@ class User {
         where: {
           id: +userId,
         },
+        include: [
+          {
+            model: location,
+            attributes: ["name"]
+          }
+        ]
       });
 
       res.status(201).json({ success: true, message: ["Success Update Data"], data: data });
@@ -82,17 +91,8 @@ class User {
   async updateUser(req, res, next) {
     try {
       const userId = req.userData.id
-      const { firstName, lastName, email, phoneNumber, address, location, image } = req.body
 
-      const updateData = await user.update({
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        address,
-        location,
-        image
-      },
+      const updateData = await user.update(req.body,
       {
         where: { id: +userId },
       });
