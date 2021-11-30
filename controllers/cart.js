@@ -95,12 +95,6 @@ class Cart {
         force: true,
       });
 
-      if (deletedData.id !== +userId) {
-        return res
-          .status(404)
-          .json({ success: false, message: ["Recipe has been deleted"] });
-      }
-
       res
         .status(200)
         .json({ success: true, message: ["Success deleting data"] });
