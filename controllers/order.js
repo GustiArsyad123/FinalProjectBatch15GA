@@ -1,4 +1,14 @@
-const { category, user, type, recipe, review, order, cart, delivery, location } = require("../models");
+const {
+  category,
+  user,
+  type,
+  recipe,
+  review,
+  order,
+  cart,
+  delivery,
+  location,
+} = require("../models");
 
 class Order {
   async createPayment(req, res, next) {
@@ -57,20 +67,19 @@ class Order {
       const userAddress = checkUser.dataValues.address;
       const userPhoneNumber = checkUser.dataValues.phoneNumber;
 
-
       let findDelivery = await delivery.findOne({
         where: {
-          phoneNumber: userPhoneNumber
-        }
-      })
+          phoneNumber: userPhoneNumber,
+        },
+      });
 
-      if (!findDelivery){
+      if (!findDelivery) {
         const addDelivery = await delivery.create({
           firstName: userFirstName,
           lastName: userLastName,
           address: userAddress,
-          phoneNumber: userPhoneNumber
-        })
+          phoneNumber: userPhoneNumber,
+        });
       }
 
       const getDelivery = await delivery.findOne({
@@ -79,8 +88,8 @@ class Order {
         },
         attributes: {
           exclude: ["createdAt", "deletedAt", "updatedAt"],
-      },
-      })
+        },
+      });
 
       const cartData = await cart.findAll({
         where: { id_user: +userId },
@@ -101,14 +110,41 @@ class Order {
 
       // let quantityRecipeA = [];
       // let quantityRecipeB = [];
-      
+      let titleRecipe = [];
+      for (let i = 0; i < cartData.length; i++) {
+        titleRecipe.push(cartData[i].recipe.id);
+      }
+      function count() {
+        array_elements = titleRecipe;
+
+        array_elements.sort();
+
+        var current = null;
+        var cnt = 0;
+
+        for (var i = 0; i < array_elements.length; i++) {
+          if (array_elements[i] != current) {
+            if (cnt > 0) {
+              console.log(current + " comes --> " + cnt + " times<br>");
+            }
+            current = array_elements[i];
+            cnt = 1;
+          } else {
+            cnt++;
+          }
+        }
+        if (cnt > 0) {
+          console.log(current + " comes --> " + cnt + " times");
+        }
+      }
+
+      count();
 
       let priceRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
         priceRecipe.push(cartData[i].recipe.price);
       }
-      priceRecipe = priceRecipe.reduce((a, b) => a + b, 0)
-
+      priceRecipe = priceRecipe.reduce((a, b) => a + b, 0);
 
       if (cartData.length == 0) {
         return res
@@ -116,20 +152,24 @@ class Order {
           .json({ success: false, errors: ["cart is empty"] });
       }
 
-      console.log(getDelivery.dataValues.id, 'INI DELIVERY VALUE');
+      console.log(getDelivery.dataValues.id, "INI DELIVERY VALUE");
 
       const createOrder = await order.create({
         id_user: +userId,
-        id_delivery:getDelivery.dataValues.id,
+        id_delivery: getDelivery.dataValues.id,
         quantity: cartData.length,
         subtotal: priceRecipe,
         deliveryFee: 15000,
-        total: priceRecipe + 15000
-      })
+        total: priceRecipe + 15000,
+      });
 
-      res
-        .status(200)
-        .json({ success: true, user: getDelivery, subtotal: priceRecipe, order: createOrder, cart: cartData });
+      res.status(200).json({
+        success: true,
+        user: getDelivery,
+        subtotal: priceRecipe,
+        order: createOrder,
+        cart: cartData,
+      });
     } catch (error) {
       console.log(error);
       res
