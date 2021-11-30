@@ -229,6 +229,75 @@ class Order {
         });
       }
 
+      const cartData = await cart.findAll({
+        where: { id_user: +userId },
+        attributes: {
+          exclude: ["createdAt", "deletedAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: recipe,
+            attributes: ["title"],
+          },
+          {
+            model: recipe,
+            attributes: ["price"],
+          },
+        ],
+      });
+
+      ////////////////////////////////////////
+      let titleRecipe = [];
+      for (let i = 0; i < cartData.length; i++) {
+        titleRecipe.push(cartData[i].recipe.title);
+      }
+
+
+        let array_elements = titleRecipe;
+        array_elements.sort();
+
+        var current = null;
+        var cnt = 0;
+
+        for (var i = 0; i < array_elements.length; i++) {
+          if (array_elements[i] != current) {
+            if (cnt > 0) {
+              console.log(current + " comes --> " + cnt + " times<br>");
+              console.log(cnt);
+            }
+            current = array_elements[i];
+            cnt = 1;
+          } else {
+            cnt++;
+          }
+        }
+        if (cnt > 0) {
+          console.log(current + " comes --> " + cnt + " times");
+          console.log(cnt);
+        }
+      
+      ////////////////////SUBSTRACT STOCK AFTER CONFIRM PAYMENT///////////////////////////////////
+
+      for (let i = 0; i < cartData.length; i++) {
+        const getStock = await recipe.update(
+        {
+          stock: cartData[i].recipe.stock - 1
+        },
+        {
+          where: {
+            id_recipe: cartData[i].recipe.id
+          }
+        })
+
+        priceRecipe.push(cartData[i].recipe.price);
+      }
+
+      const getStock = await recipe.findAll({
+        where: {
+          id_recipe
+        }
+      })
+
       const emptyDelivery = await delivery.destroy({
         where: { id_user: +userId },
       });
