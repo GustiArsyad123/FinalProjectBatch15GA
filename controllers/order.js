@@ -108,7 +108,7 @@ class Order {
         ],
       });
 
-///////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////
       let titleRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
         titleRecipe.push(cartData[i].recipe.title);
@@ -142,7 +142,8 @@ class Order {
       }
 
       count();
-//////////////////////////////////////////////////////////////////////
+      let data = count();
+      //////////////////////////////////////////////////////////////////////
       let priceRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
         priceRecipe.push(cartData[i].recipe.price);
@@ -170,6 +171,7 @@ class Order {
         subtotal: priceRecipe,
         order: createOrder,
         cart: cartData,
+        data: data,
       });
     } catch (error) {
       console.log(error);
