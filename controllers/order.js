@@ -1,4 +1,4 @@
-const { category, user, type, recipe, review, order, cart, delivery } = require("../models");
+const { category, user, type, recipe, review, order, cart, delivery, location } = require("../models");
 
 class Order {
   async createPayment(req, res, next) {
@@ -57,34 +57,20 @@ class Order {
       const userAddress = checkUser.dataValues.address
       const userPhoneNumber = checkUser.dataValues.phoneNumber
 
-      // let getRecipe = [];
-
-      // let req = {
-      //   body: {
-      //     recipe: []
-      //   }
-      // }
-
-      // await recipe.findAll
-
-      // for(let i = 0; i < req.body.recipe.length; i++){
-      //   getRecipe.push(req.body.recipe[i].id)
-      // }
-
-      // await recipe.findAll({
-      //   where: {
-      //     id: getRecipe
-      //   }
-      // })
-
-      // console.log(getRecipe);
-
-      const addDelivery = await delivery.create({
-        firstName: userFirstName,
-        lastName: userLastName,
-        address: userAddress,
-        phoneNumber: userPhoneNumber
+      let findDelivery = await delivery.findOne({
+        where: {
+          phoneNumber: userPhoneNumber
+        }
       })
+
+      if (!findDelivery){
+        const addDelivery = await delivery.create({
+          firstName: userFirstName,
+          lastName: userLastName,
+          address: userAddress,
+          phoneNumber: userPhoneNumber
+        })
+      }
 
       const getDelivery = await delivery.findOne({
         where: {
@@ -94,7 +80,6 @@ class Order {
           exclude: ["createdAt", "deletedAt", "updatedAt"],
       },
       })
-
 
       const cartData = await cart.findAll(
         {
@@ -116,7 +101,6 @@ class Order {
       for(let i = 0; i < cartData.length; i++){
         priceRecipe.push(cartData[i].recipe.price)
       }
-
       priceRecipe = priceRecipe.reduce((a, b) => a + b, 0)
 
 
@@ -126,17 +110,16 @@ class Order {
           .json({ success: false, errors: ["cart is empty"] });
       }
 
-      // cartData[i].price
+      console.log(getDelivery.dataValues.id, 'INI DELIVERY VALUE');
 
       const createOrder = await order.create({
         id_user: +userId,
-        id_delivery: getDelivery.dataValues.id,
+        id_delivery:getDelivery.dataValues.id,
         quantity: cartData.length,
         subtotal: priceRecipe,
         deliveryFee: 15000,
         total: priceRecipe + 15000
       })
-
 
       res
         .status(200)

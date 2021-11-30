@@ -121,7 +121,7 @@ module.exports = {
     await queryInterface.addConstraint('orders', {
       fields: ['id_delivery'],
       type: 'foreign key',
-      name: 'custom_fkey_id_deliveryOrder',
+      name: 'custom_fkey_id_deliveryorder',
       references: {
         //Required field
         table: 'deliveries',
