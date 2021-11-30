@@ -174,7 +174,7 @@ class Order {
           id_user: +userId
         },
         attributes: {
-          exclude: ["id_recipe", "createdAt", "updatedAt", "deletedAt"]
+          exclude: ["id_recipe", "id_category", "id_type", "createdAt", "updatedAt", "deletedAt"]
         }
       })
 
