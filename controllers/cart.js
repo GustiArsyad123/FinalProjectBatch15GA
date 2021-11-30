@@ -90,7 +90,7 @@ class Cart {
       }
       const deletedData = await cart.destroy({
         where: {
-          id_recipe: +idRecipe,
+          id: +idRecipe,
         },
         force: true,
       });
