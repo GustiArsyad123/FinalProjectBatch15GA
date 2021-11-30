@@ -108,14 +108,15 @@ class Order {
         ],
       });
 
-      // let quantityRecipeA = [];
-      // let quantityRecipeB = [];
+///////////////////////////////////////////////////////////
       let titleRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
-        titleRecipe.push(cartData[i].recipe.id);
+        titleRecipe.push(cartData[i].recipe.title);
       }
+
+      console.log(titleRecipe);
       function count() {
-        array_elements = titleRecipe;
+        let array_elements = titleRecipe;
 
         array_elements.sort();
 
@@ -126,6 +127,7 @@ class Order {
           if (array_elements[i] != current) {
             if (cnt > 0) {
               console.log(current + " comes --> " + cnt + " times<br>");
+              console.log(cnt);
             }
             current = array_elements[i];
             cnt = 1;
@@ -135,11 +137,12 @@ class Order {
         }
         if (cnt > 0) {
           console.log(current + " comes --> " + cnt + " times");
+          console.log(cnt);
         }
       }
 
       count();
-
+//////////////////////////////////////////////////////////////////////
       let priceRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
         priceRecipe.push(cartData[i].recipe.price);
@@ -151,8 +154,6 @@ class Order {
           .status(404)
           .json({ success: false, errors: ["cart is empty"] });
       }
-
-      console.log(getDelivery.dataValues.id, "INI DELIVERY VALUE");
 
       const createOrder = await order.create({
         id_user: +userId,
