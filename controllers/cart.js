@@ -21,6 +21,16 @@ class Cart {
         attributes: {
           exclude: ["createdAt", "updatedAt", "deletedAt"],
         },
+        include: [
+          {
+            model: recipe,
+            attributes: ["title"],
+          },
+          {
+            model: recipe,
+            attributes: ["price"],
+          },
+        ]
       });
       if (data.length == 0) {
         return res
