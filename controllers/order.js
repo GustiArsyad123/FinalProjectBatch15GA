@@ -108,7 +108,9 @@ class Order {
         ],
       });
 
-      ///////////////////////////////////////////////////////////
+      console.log("INI CART DATA", JSON.stringify(cartData));
+
+ 
       let titleRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
         titleRecipe.push(cartData[i].recipe.title);
@@ -136,7 +138,7 @@ class Order {
           penampunganData.push({ title: current, amount: cnt })
         }
 
-      //////////////////////////////////////////////////////////////////////
+
       let priceRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
         priceRecipe.push(cartData[i].recipe.price);
@@ -149,6 +151,7 @@ class Order {
           .json({ success: false, errors: ["cart is empty"] });
       }
 
+ 
       const findOrder = await order.findOne({
         where: {
           id_user: +userId
@@ -171,7 +174,7 @@ class Order {
           id_user: +userId
         },
         attributes: {
-          exclude: ["createdAt", "updatedAt", "deletedAt"]
+          exclude: ["id_recipe", "createdAt", "updatedAt", "deletedAt"]
         }
       })
 
@@ -260,7 +263,7 @@ class Order {
       ////////////////////////////////////////
       let titleRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
-        titleRecipe.push(cartData[i].recipe.title);
+        titleRecipe.push([cartData[i].recipe.title, cartData[i].recipe.id]);
       }
 
 
@@ -270,11 +273,11 @@ class Order {
         var current = null;
         var cnt = 0;
 
+        let penampunganData = []
         for (var i = 0; i < array_elements.length; i++) {
           if (array_elements[i] != current) {
             if (cnt > 0) {
-              console.log(current + " comes --> " + cnt + " times<br>");
-              console.log(cnt);
+              penampunganData.push({ title: current, amount: cnt })
             }
             current = array_elements[i];
             cnt = 1;
@@ -283,16 +286,26 @@ class Order {
           }
         }
         if (cnt > 0) {
-          console.log(current + " comes --> " + cnt + " times");
-          console.log(cnt);
+          penampunganData.push({ title: current, amount: cnt })
         }
+        console.log(penampunganData);
       
       ////////////////////SUBSTRACT STOCK AFTER CONFIRM PAYMENT///////////////////////////////////
 
+      function findAmountByTitle(title, arr) {
+        for(let i = 0; i < arr.length; i++) {
+          if(title === arr[i].title) {
+            return arr[i].amount
+          }
+        }
+      }
+      
+
       for (let i = 0; i < cartData.length; i++) {
+        console.log("INI CARDDATA", cartData[i]);
         const getStock = await recipe.update(
         {
-          stock: cartData[i].recipe.stock - 1
+          stock: cartData[i].recipe.stock - findAmountByTitle(cartData[i].recipe.title, penampunganData)
         },
         {
           where: {
