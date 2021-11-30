@@ -114,20 +114,17 @@ class Order {
         titleRecipe.push(cartData[i].recipe.title);
       }
 
-      console.log(titleRecipe);
-      function count() {
         let array_elements = titleRecipe;
-
         array_elements.sort();
 
         var current = null;
         var cnt = 0;
 
+        let penampunganData = []
         for (var i = 0; i < array_elements.length; i++) {
           if (array_elements[i] != current) {
             if (cnt > 0) {
-              console.log(current + " comes --> " + cnt + " times<br>");
-              console.log(cnt);
+              penampunganData.push({ title: current, amount: cnt })
             }
             current = array_elements[i];
             cnt = 1;
@@ -136,13 +133,9 @@ class Order {
           }
         }
         if (cnt > 0) {
-          console.log(current + " comes --> " + cnt + " times");
-          console.log(cnt);
+          penampunganData.push({ title: current, amount: cnt })
         }
-      }
 
-      count();
-      let data = count();
       //////////////////////////////////////////////////////////////////////
       let priceRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
@@ -156,6 +149,13 @@ class Order {
           .json({ success: false, errors: ["cart is empty"] });
       }
 
+      const findOrder = await order.findOne({
+        where: {
+          id_user: +userId
+        }
+      })
+
+      if (!findOrder) {
       const createOrder = await order.create({
         id_user: +userId,
         id_delivery: getDelivery.dataValues.id,
@@ -163,15 +163,24 @@ class Order {
         subtotal: priceRecipe,
         deliveryFee: 15000,
         total: priceRecipe + 15000,
-      });
+      })
+      };
+
+      const getOrder = await order.findOne({
+        where: {
+          id_user: +userId
+        },
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"]
+        }
+      })
 
       res.status(200).json({
         success: true,
         user: getDelivery,
-        subtotal: priceRecipe,
-        order: createOrder,
+        quantityPerReceipt: penampunganData,
+        order: getOrder,
         cart: cartData,
-        data: data,
       });
     } catch (error) {
       console.log(error);

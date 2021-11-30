@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
       models.order.belongsTo(models.delivery, {
         foreignKey: "id_delivery",
       });
+      models.order.hasMany(models.seller, {
+        foreignKey: "id_order",
+      });
 
       // define association here
     }
