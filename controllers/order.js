@@ -73,9 +73,9 @@ class Order {
         },
       });
 
-      if (findDelivery === null) {
+      if (findDelivery == undefined) {
         const addDelivery = await delivery.create({
-          usernya: userId,
+          usernya: +userId,
           firstName: userFirstName,
           lastName: userLastName,
           address: userAddress,
@@ -98,6 +98,10 @@ class Order {
           exclude: ["createdAt", "deletedAt", "updatedAt"],
         },
         include: [
+          {
+            model: recipe,
+            attributes: ["image"],
+          },
           {
             model: recipe,
             attributes: ["title"],

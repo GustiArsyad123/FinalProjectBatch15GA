@@ -32,6 +32,7 @@ class Recipe {
         .status(201)
         .json({ success: true, message: ["Create recipe Success!!"] });
     } catch (error) {
+      console.log(error);
       res
         .status(500)
         .json({ success: false, errors: ["Internal Server Error"] });
