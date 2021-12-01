@@ -14,7 +14,6 @@ class Order {
   async createPayment(req, res, next) {
     try {
       const userId = req.userData.id;
-      const { uploadReceipt } = req.body;
       const checkUser = await user.findOne({
         where: { id: userId },
       });
@@ -28,8 +27,10 @@ class Order {
         });
       }
 
-      const data = await order.create({
-        uploadReceipt,
+      const data = await order.update(req.body,{
+        where: {
+          id_user: +userId
+        }
       });
 
       res
@@ -45,7 +46,6 @@ class Order {
   async getCheckout(req, res, next) {
     try {
       const userId = req.userData.id;
-
       const checkUser = await user.findOne({
         where: { id: +userId },
         attributes: {
@@ -69,12 +69,13 @@ class Order {
 
       let findDelivery = await delivery.findOne({
         where: {
-          phoneNumber: userPhoneNumber,
+          usernya: +userId,
         },
       });
 
-      if (!findDelivery) {
+      if (findDelivery === null) {
         const addDelivery = await delivery.create({
+          usernya: userId,
           firstName: userFirstName,
           lastName: userLastName,
           address: userAddress,
@@ -84,10 +85,10 @@ class Order {
 
       const getDelivery = await delivery.findOne({
         where: {
-          phoneNumber: userPhoneNumber,
+          usernya: +userId,
         },
         attributes: {
-          exclude: ["createdAt", "deletedAt", "updatedAt"],
+          exclude: ["usernya", "createdAt", "deletedAt", "updatedAt"],
         },
       });
 
@@ -105,52 +106,50 @@ class Order {
             model: recipe,
             attributes: ["price"],
           },
+          {
+            model: recipe,
+            attributes: ["stock"],
+          }
         ],
       });
-
-      console.log("INI CART DATA", JSON.stringify(cartData));
-
  
       let titleRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
         titleRecipe.push(cartData[i].recipe.title);
       }
 
-        let array_elements = titleRecipe;
-        array_elements.sort();
+      let getTitleAmount = titleRecipe;
+      getTitleAmount.sort();
 
-        var current = null;
-        var cnt = 0;
+      let resep = null;
+      let count = 0;
 
-        let penampunganData = []
-        for (var i = 0; i < array_elements.length; i++) {
-          if (array_elements[i] != current) {
-            if (cnt > 0) {
-              penampunganData.push({ title: current, amount: cnt })
+      let titleAndAmount = []
+        for (var i = 0; i < getTitleAmount.length; i++) {
+          if (getTitleAmount[i] != resep) {
+            if (count > 0) {
+              titleAndAmount.push({ title: resep, amount: count })
             }
-            current = array_elements[i];
-            cnt = 1;
+            resep = getTitleAmount[i];
+            count = 1;
           } else {
-            cnt++;
+            count++;
           }
         }
-        if (cnt > 0) {
-          penampunganData.push({ title: current, amount: cnt })
-        }
+        if (count > 0) {
+          titleAndAmount.push({ title: resep, amount: count })
+    }
 
 
       let priceRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
         priceRecipe.push(cartData[i].recipe.price);
       }
-      priceRecipe = priceRecipe.reduce((a, b) => a + b, 0);
+      priceRecipe = priceRecipe.reduce((a, b) => a + b, 0); // Count All Price
 
       if (cartData.length == 0) {
-        return res
-          .status(404)
-          .json({ success: false, errors: ["cart is empty"] });
+        return res.status(404).json({ success: false, errors: ["cart is empty"] });
       }
-
  
       const findOrder = await order.findOne({
         where: {
@@ -159,14 +158,14 @@ class Order {
       })
 
       if (!findOrder) {
-      const createOrder = await order.create({
-        id_user: +userId,
-        id_delivery: getDelivery.dataValues.id,
-        quantity: cartData.length,
-        subtotal: priceRecipe,
-        deliveryFee: 15000,
-        total: priceRecipe + 15000,
-      })
+        const createOrder = await order.create({
+          id_user: +userId,
+          id_delivery: getDelivery.dataValues.id,
+          quantity: cartData.length,
+          subtotal: priceRecipe,
+          deliveryFee: 15000,
+          total: priceRecipe + 15000,
+        })
       };
 
       const getOrder = await order.findOne({
@@ -181,22 +180,21 @@ class Order {
       res.status(200).json({
         success: true,
         user: getDelivery,
-        quantityPerReceipt: penampunganData,
+        quantityPerReceipt: titleAndAmount,
         order: getOrder,
         cart: cartData,
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
   async editAddressDelivery(req, res, next) {
     try {
       const userId = req.userData.id;
-      const { firstName, lastName, address, phoneNumber } = req.body;
+      const { idDelivery } = req.params
+      // const { firstName, lastName, address, phoneNumber } = req.body;
       const checkUser = await user.findOne({
         where: { id: +userId },
       });
@@ -211,13 +209,12 @@ class Order {
       }
 
       const updatedData = await delivery.update(req.body, {
-        where: { id_user: +userId },
+        where: { id: idDelivery },
       });
 
       res.status(201).json({
         success: true,
-        message: ["Success edit delivery address"],
-        data: updatedData,
+        message: ["Success edit delivery address"]
       });
     } catch (error) {
       console.log(error);
@@ -243,11 +240,11 @@ class Order {
         });
       }
 
-      const cartData = await cart.findAll({
+      /* INI BUAT NYARI ISI DI CART */
+      let arrayResepDiCart = []
+      let arrayStock = []
+      let resepDiCart = await cart.findAll({
         where: { id_user: +userId },
-        attributes: {
-          exclude: ["createdAt", "deletedAt", "updatedAt"],
-        },
         include: [
           {
             model: recipe,
@@ -255,92 +252,78 @@ class Order {
           },
           {
             model: recipe,
-            attributes: ["price"],
-          },
-        ],
-      });
+            attributes: ["stock"],
+          }
+        ]
+      })
 
-      ////////////////////////////////////////
-      let titleRecipe = [];
-      for (let i = 0; i < cartData.length; i++) {
-        titleRecipe.push([cartData[i].recipe.title, cartData[i].recipe.id]);
+      for (let i = 0; i < resepDiCart.length; i++) {
+        arrayResepDiCart.push(resepDiCart[i].recipe.title);
+        arrayStock.push(resepDiCart[i].recipe.stock);
       }
 
+      /* INI BUAT NYARI QUANTITY PER RESEP DI CART */
+      let recipeQuantity = [];
+      for (let i = 0; i < resepDiCart.length; i++) {
+        recipeQuantity.push(resepDiCart[i].recipe.title);
+      }
 
-        let array_elements = titleRecipe;
-        array_elements.sort();
+      let titleAndAmount = recipeQuantity;
+      titleAndAmount.sort();
 
-        var current = null;
-        var cnt = 0;
+      let resep = null;
+      let cnt = 0;
 
-        let penampunganData = []
-        for (var i = 0; i < array_elements.length; i++) {
-          if (array_elements[i] != current) {
+      let amount = []
+        for (var i = 0; i < titleAndAmount.length; i++) {
+          if (titleAndAmount[i] != resep) {
             if (cnt > 0) {
-              penampunganData.push({ title: current, amount: cnt })
+              amount.push(cnt)
             }
-            current = array_elements[i];
+            resep = titleAndAmount[i];
             cnt = 1;
           } else {
             cnt++;
           }
         }
         if (cnt > 0) {
-          penampunganData.push({ title: current, amount: cnt })
-        }
-        console.log(penampunganData);
-      
-      ////////////////////SUBSTRACT STOCK AFTER CONFIRM PAYMENT///////////////////////////////////
+          amount.push(cnt)
+      }
+    
 
-      function findAmountByTitle(title, arr) {
-        for(let i = 0; i < arr.length; i++) {
-          if(title === arr[i].title) {
-            return arr[i].amount
+      /* INI BUAT NYARI QUANTITY PER RESEP DI CART */
+      for (let i = 0; i < arrayResepDiCart.length - 1; i++){
+        for (let j = 0; j < arrayStock.length; j++) {
+          for (let k = 0; k < amount.length; k++) {
+            let updateResep = await recipe.update({
+              stock: parseInt(arrayStock[i]) - parseInt(amount[i])
+            },{
+              where: {
+                title: arrayResepDiCart[i]
+              }
+            })
           }
         }
       }
-      
-
-      for (let i = 0; i < cartData.length; i++) {
-        console.log("INI CARDDATA", cartData[i]);
-        const getStock = await recipe.update(
-        {
-          stock: cartData[i].recipe.stock - findAmountByTitle(cartData[i].recipe.title, penampunganData)
-        },
-        {
-          where: {
-            id_recipe: cartData[i].recipe.id
-          }
-        })
-
-        priceRecipe.push(cartData[i].recipe.price);
-      }
-
-      const getStock = await recipe.findAll({
-        where: {
-          id_recipe
-        }
-      })
 
       const emptyDelivery = await delivery.destroy({
-        where: { id_user: +userId },
+        where: { usernya: +userId },
       });
       const emptyCart = await cart.destroy({
         where: { id_user: +userId },
       });
 
-      res.status(201).json({
-        success: true,
-        message: [
-          "Success submit your receipt, please wait seller to process your request",
-        ],
-      });
+      if(!emptyCart){
+        return res.status(404).json({ status: false, errors: ["Cart is empty"]})
+      }
+
+      res.status(201).json({ success: true, message: ["Success submit your receipt payment, please wait seller to process your request"]});
     } catch (error) {
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      console.log(error);
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
+
   async updateReceipt(req, res, next) {
     try {
       const userId = req.userData.id;
