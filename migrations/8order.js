@@ -24,10 +24,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER
       },
-      id_delivery: {
-        allowNull: false,
-        type: Sequelize.INTEGER
-      },
       quantity: {
         allowNull: true,
         type: Sequelize.INTEGER
@@ -59,7 +55,11 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
-      }
+      },
+      id_delivery: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
     });
     // id_category foreign key
     await queryInterface.addConstraint('orders', {

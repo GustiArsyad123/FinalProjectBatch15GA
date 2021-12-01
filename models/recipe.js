@@ -23,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
     id_category: DataTypes.INTEGER,
     id_user: DataTypes.INTEGER,
     id_type: DataTypes.INTEGER,
-    id_location: DataTypes.INTEGER,
     title: DataTypes.STRING,
     duration: DataTypes.STRING,
     serving: DataTypes.STRING,
@@ -33,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     ingredient: DataTypes.JSONB,
     stock: DataTypes.INTEGER,
     price: DataTypes.INTEGER,
+    id_location: DataTypes.INTEGER,
   }, {
     sequelize,
     paranoid: true,

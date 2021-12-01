@@ -56,7 +56,7 @@ module.exports = {
         allowNull: true,
         type: Sequelize.INTEGER,
       },
-      id_location: {
+      location: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
@@ -71,6 +71,10 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE,
+      },
+      id_location: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
     });
     // id_category foreign key
