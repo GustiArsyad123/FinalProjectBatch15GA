@@ -6,7 +6,7 @@ class User {
   async getDetailUser(req, res, next) {
     try {
       const userId = req.userData.id;
-
+//
       const data = await user.findOne({
         where: { id: +userId },
         attributes: {
