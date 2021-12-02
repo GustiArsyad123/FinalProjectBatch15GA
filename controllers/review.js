@@ -3,21 +3,23 @@ const { review, category, user, type, recipe } = require("../models");
 class Review {
   async getAllreview(req, res, next) {
     try {
-
       const userId = req.userData.id;
-      const { idRecipe } = req.params
+      const { idRecipe } = req.params;
 
       const checkUser = await user.findOne({
-          where: { id: +userId },
-      })
+        where: { id: +userId },
+      });
 
       if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to access."]})
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to access."],
+        });
       }
 
       const data = await review.findAll({
         where: {
-          id_recipe: +idRecipe
+          id_recipe: +idRecipe,
         },
         attributes: {
           exclude: ["deletedAt"],
@@ -41,77 +43,92 @@ class Review {
           },
           {
             model: type,
-            attributes: ["name"]
-          }
-        ],   
-        order: [['id', 'DESC']]
+            attributes: ["name"],
+          },
+        ],
+        order: [["id", "DESC"]],
       });
 
       if (data == null) {
-        return res.status(404).json({ success: false, errors: ["Review not found"] });
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Review not found"] });
       }
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
   async updateReview(req, res, next) {
     try {
-
       const userId = req.userData.id;
-      const { idRecipe, idReview } = req.params
-      const { comment } = req.body
+      const { idRecipe, idReview } = req.params;
+      const { comment } = req.body;
 
       const checkUser = await user.findOne({
-          where: { id: +userId },
-      })
+        where: { id: +userId },
+      });
 
       if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to access."]})
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to access."],
+        });
       }
 
       const updateData = await review.update(
         {
-          comment: comment
+          comment: comment,
         },
         {
           where: {
             id: +idReview,
-            id_recipe: +idRecipe
-        },
-      });
+            id_recipe: +idRecipe,
+          },
+        }
+      );
 
       if (updateData == null) {
-        return res.status(404).json({ success: false, errors: ["Review not found"] });
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Review not found"] });
       }
 
-      res.status(201).json({ success: true, message: ["Succes Update Your Review"] });
+      res
+        .status(201)
+        .json({ success: true, message: ["Succes Update Your Review"] });
     } catch (error) {
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
   async getDetailReview(req, res, next) {
     try {
-
       const userId = req.userData.id;
-      const { idRecipe, idReview } = req.params
+      const { idRecipe, idReview } = req.params;
 
       const checkUser = await user.findOne({
-          where: { id: +userId },
-      })
+        where: { id: +userId },
+      });
 
       if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to access.."]})
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to access.."],
+        });
       }
 
       const data = await review.findOne({
-        where: { 
+        where: {
           id: +idReview,
-          id_recipe: +idRecipe
+          id_recipe: +idRecipe,
         },
         attributes: {
           exclude: ["updatedAt", "deletedAt"],
@@ -135,87 +152,105 @@ class Review {
           },
           {
             model: type,
-            attributes: ["name"]
+            attributes: ["name"],
           },
-      ],  
+        ],
       });
 
       if (data == null) {
-        return res.status(404).json({ success: false, errors: ["Review not found"] });
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Review not found"] });
       }
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
   async createReview(req, res, next) {
     try {
-
       const userId = req.userData.id;
-      const { idRecipe } = req.params
-      const { comment } = req.body
+      const { idRecipe } = req.params;
+      const { comment } = req.body;
       const checkUser = await user.findOne({
-          where: { id: +userId },
-      })
+        where: { id: +userId },
+      });
 
       if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to access."]})
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to access."],
+        });
       }
 
       const getRecipe = await recipe.findOne({
         where: {
-          id: idRecipe
-        }
-      })
+          id: idRecipe,
+        },
+      });
 
       if (getRecipe == null) {
-        return res.status(404).json({ success: false, errors: ["Recipe not found"]})
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Recipe not found"] });
       }
 
-      const idCategory = getRecipe.dataValues.id_category
-      const idType = getRecipe.dataValues.id_type
+      const idCategory = getRecipe.dataValues.id_category;
+      const idType = getRecipe.dataValues.id_type;
 
-      const newReview = await review.create({
+      await review.create({
         id_user: +userId,
         id_recipe: +idRecipe,
         id_category: +idCategory,
         id_type: +idType,
         comment: comment,
-        // createdAt: moment().startOf('hour').fromNow()
       });
 
-      res.status(201).json({ success: true, message: ["Congrats! You have successfully submitted a Review"] });
+      res.status(201).json({
+        success: true,
+        message: ["Congrats! You have successfully submitted a Review"],
+      });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
   async deleteReview(req, res, next) {
     try {
-
       const userId = req.userData.id;
-      const { idRecipe, idReview } = req.params
+      const { idRecipe, idReview } = req.params;
       const checkUser = await user.findOne({
-          where: { id: +userId },
-      })
-
-      if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to access."]})
-      }
-
-      const deleteData = await review.destroy({ 
-        where: {
-            id: +idReview,
-            id_recipe: +idRecipe
-        } 
+        where: { id: +userId },
       });
 
-      res.status(200).json({ success: true, message: ["Success delete your Review!"] });
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to access."],
+        });
+      }
+
+      await review.destroy({
+        where: {
+          id: +idReview,
+          id_recipe: +idRecipe,
+        },
+      });
+
+      res
+        .status(200)
+        .json({ success: true, message: ["Success delete your Review!"] });
     } catch (error) {
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 }

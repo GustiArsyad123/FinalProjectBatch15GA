@@ -16,7 +16,7 @@ class Recipe {
         description,
       } = req.body;
 
-      const data = await recipe.create({
+      await recipe.create({
         id_user: +userId,
         id_category,
         id_type,
@@ -176,7 +176,7 @@ class Recipe {
         orders = "createdAt",
         sort = "ASC",
         gte = 0,
-        lte = 100000000
+        lte = 100000000,
       } = req.query;
 
       const data = await recipe.findAll({
@@ -185,9 +185,9 @@ class Recipe {
             id_category: cat,
             id_type: type,
           },
-          price : {
-            [Op.between] : [gte, lte]
-          }          
+          price: {
+            [Op.between]: [gte, lte],
+          },
         },
         attributes: {
           exclude: ["createdAt", "updatedAt", "deletedAt"],
@@ -203,12 +203,8 @@ class Recipe {
           },
           {
             model: location,
-            attributes: ["name"]
-          }
-          // {
-          //     model: type,
-          //     attributes: ["name"]
-          // }
+            attributes: ["name"],
+          },
         ],
         order: [[orders || "createdAt", sort || "DESC"]],
         limit: +limit,
@@ -262,8 +258,8 @@ class Recipe {
           },
           {
             model: location,
-            attributes: ["name"]
-          }
+            attributes: ["name"],
+          },
         ],
         order: [["createdAt", "DESC"]],
         limit: +limit,
@@ -314,11 +310,8 @@ class Recipe {
           },
           {
             model: location,
-            attributes: ["name"]
-          }
-          //   {
-          //     model: review,
-          //   },
+            attributes: ["name"],
+          },
         ],
       });
 
@@ -327,7 +320,7 @@ class Recipe {
         where: { id_recipe: req.params.id },
         attributes: {
           include: ["comment"],
-          exclude: ["deletedAt"]
+          exclude: ["deletedAt"],
         },
       });
 
@@ -385,8 +378,8 @@ class Recipe {
           },
           {
             model: location,
-            attributes: ["name"]
-          }
+            attributes: ["name"],
+          },
         ],
       });
 
@@ -469,8 +462,8 @@ class Recipe {
           },
           {
             model: location,
-            attributes: ["name"]
-          }
+            attributes: ["name"],
+          },
         ],
       });
 
