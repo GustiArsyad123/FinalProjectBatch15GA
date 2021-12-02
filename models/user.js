@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
       models.user.hasMany(models.seller, {
         foreignKey: "id_user",
       });
+      models.user.hasMany(models.rating, {
+        foreignKey: "id_user",
+      });
       models.user.belongsTo(models.location, { foreignKey: "id_location" });
       // define association here
     }

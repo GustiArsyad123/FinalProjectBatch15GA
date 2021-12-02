@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       models.recipe.hasMany(models.order, { foreignKey: "id_recipe" });
       models.recipe.hasMany(models.cart, { foreignKey: "id_recipe" });
       models.recipe.hasMany(models.seller, { foreignKey: "id_recipe" });
+      models.recipe.hasMany(models.rating, { foreignKey: "id_recipe" });
       models.recipe.belongsTo(models.category, { foreignKey: "id_category" });
       models.recipe.belongsTo(models.user, { foreignKey: "id_user" });
       models.recipe.belongsTo(models.type, { foreignKey: "id_type" });
