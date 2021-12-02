@@ -237,7 +237,7 @@ class Review {
         });
       }
 
-      const deleteData = await review.destroy({
+      await review.destroy({
         where: {
           id: +idReview,
           id_recipe: +idRecipe,
