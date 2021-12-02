@@ -1,4 +1,5 @@
 "use strict";
+const moment = require("moment");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class review extends Model {
@@ -30,5 +31,23 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "review",
     }
   );
+
+  review.afterFind((instance) => {
+    if (instance.length > 0) {
+      instance.forEach((el) => {
+        let waktu = new Date(el.dataValues.updatedAt).toLocaleString(
+          "en-US",
+          {
+            timeZone: "Asia/Jakarta",
+          }
+        );
+
+        el.dataValues.commentTime = moment(
+          waktu,
+          "MM/DD/YYYY hh:mm:ss A"
+        ).fromNow();
+      });
+    }
+  });
   return review;
 };

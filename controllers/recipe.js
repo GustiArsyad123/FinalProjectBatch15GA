@@ -1,6 +1,5 @@
 const { category, user, type, recipe, review, location } = require("../models");
 const { Op } = require("sequelize");
-const moment = require("moment");
 const { gte } = require("sequelize/dist/lib/operators");
 
 class Recipe {
@@ -80,9 +79,7 @@ class Recipe {
       );
 
       if (updatedData[0] === 0) {
-        return res
-          .status(404)
-          .json({ success: false, errors: ["recipe not found"] });
+        return res.status(404).json({ success: false, errors: ["recipe not found"] });
       }
 
       res
@@ -90,9 +87,7 @@ class Recipe {
         .json({ success: true, message: ["Success update your recipe"] });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -123,19 +118,13 @@ class Recipe {
       );
 
       if (updatedData[0] == 0) {
-        return res
-          .status(404)
-          .json({ success: false, errors: ["recipe not found"] });
+        return res.status(404).json({ success: false, errors: ["recipe not found"] });
       }
 
-      res
-        .status(201)
-        .json({ success: true, message: ["Success update your recipe"] });
+      res.status(201).json({ success: true, message: ["Success update your recipe"] });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -168,18 +157,12 @@ class Recipe {
       );
 
       if (updatedData[0] == 0) {
-        return res
-          .status(404)
-          .json({ success: false, errors: ["recipe not found"] });
+        return res.status(404).json({ success: false, errors: ["recipe not found"] });
       }
 
-      res
-        .status(201)
-        .json({ success: true, message: ["Success update your recipe"] });
+      res.status(201).json({ success: true, message: ["Success update your recipe"] });
     } catch (error) {
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -241,9 +224,7 @@ class Recipe {
       res.status(200).json({ success: true, data: data });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -290,16 +271,12 @@ class Recipe {
       });
 
       if (data == null) {
-        return res
-          .status(404)
-          .json({ success: false, errors: ["Recipe not found"] });
+        return res.status(404).json({ success: false, errors: ["Recipe not found"] });
       }
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -352,24 +329,6 @@ class Recipe {
           include: ["comment"],
           exclude: ["deletedAt"]
         },
-      });
-
-      await review.afterFind((instance) => {
-        if (instance.length > 0) {
-          instance.forEach((el) => {
-            let waktu = new Date(el.dataValues.updatedAt).toLocaleString(
-              "en-US",
-              {
-                timeZone: "Asia/Jakarta",
-              }
-            );
-
-            el.dataValues.commentTime = moment(
-              waktu,
-              "MM/DD/YYYY hh:mm:ss A"
-            ).fromNow();
-          });
-        }
       });
 
       if (data == null) {

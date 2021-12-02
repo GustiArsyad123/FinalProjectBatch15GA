@@ -95,9 +95,13 @@ class Order {
       const cartData = await cart.findAll({
         where: { id_user: +userId },
         attributes: {
-          exclude: ["createdAt", "deletedAt", "updatedAt"],
+          exclude: ["id_user", "createdAt", "deletedAt", "updatedAt"],
         },
         include: [
+          {
+            model: recipe,
+            attributes: ["id_user"],
+          },
           {
             model: recipe,
             attributes: ["image"],
