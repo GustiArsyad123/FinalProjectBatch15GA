@@ -45,6 +45,14 @@ exports.createRecipeOneValidator = async (req, res, next) => {
       errors.push("Please insert your picture");
     }
 
+    if (!validator.isInt(req.body.serving)) {
+      errors.push("Please fill with number");
+    }
+
+    if (!validator.isInt(req.body.duration)) {
+      errors.push("Please fill with number");
+    }
+
     if (validator.isEmpty(req.body.title, { ignore_whitespace: false })) {
       errors.push("Please fill the title");
     }
@@ -54,6 +62,8 @@ exports.createRecipeOneValidator = async (req, res, next) => {
     if (validator.isEmpty(req.body.duration, { ignore_whitespace: false })) {
       errors.push("Please fill the duration");
     }
+
+
     // const checkCategory = await category.findOne({
     //   where: {
     //     email: req.body.category,
@@ -65,6 +75,9 @@ exports.createRecipeOneValidator = async (req, res, next) => {
     if (validator.isEmpty(req.body.serving, { ignore_whitespace: false })) {
       errors.push("Please fill this recipe for how many person");
     }
+
+
+
     if (validator.isEmpty(req.body.description, { ignore_whitespace: false })) {
       errors.push("Please fill description");
     }

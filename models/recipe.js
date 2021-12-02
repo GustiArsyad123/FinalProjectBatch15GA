@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       models.recipe.hasMany(models.review, { foreignKey: "id_recipe" });
       models.recipe.hasMany(models.order, { foreignKey: "id_recipe" });
       models.recipe.hasMany(models.cart, { foreignKey: "id_recipe" });
+      models.recipe.hasMany(models.seller, { foreignKey: "id_recipe" });
       models.recipe.belongsTo(models.category, { foreignKey: "id_category" });
       models.recipe.belongsTo(models.user, { foreignKey: "id_user" });
       models.recipe.belongsTo(models.type, { foreignKey: "id_type" });
@@ -22,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
     id_category: DataTypes.INTEGER,
     id_user: DataTypes.INTEGER,
     id_type: DataTypes.INTEGER,
-    id_location: DataTypes.INTEGER,
     title: DataTypes.STRING,
     duration: DataTypes.STRING,
     serving: DataTypes.STRING,
@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     ingredient: DataTypes.JSONB,
     stock: DataTypes.INTEGER,
     price: DataTypes.INTEGER,
-    // location: DataTypes.STRING,
+    id_location: DataTypes.INTEGER,
   }, {
     sequelize,
     paranoid: true,

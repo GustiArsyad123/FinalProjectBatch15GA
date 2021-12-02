@@ -1,6 +1,7 @@
 const { category, user, type, recipe, review, location } = require("../models");
 const { Op } = require("sequelize");
 const moment = require("moment");
+const { gte } = require("sequelize/dist/lib/operators");
 
 class Recipe {
   async createRecipeOne(req, res, next) {
@@ -31,6 +32,7 @@ class Recipe {
         .status(201)
         .json({ success: true, message: ["Create recipe Success!!"] });
     } catch (error) {
+      console.log(error);
       res
         .status(500)
         .json({ success: false, errors: ["Internal Server Error"] });
@@ -186,18 +188,23 @@ class Recipe {
       let {
         page = 1,
         limit = 6,
-        cat = 1,
+        cat = 5,
         type = 1,
         orders = "createdAt",
         sort = "ASC",
+        gte = 0,
+        lte = 100000000
       } = req.query;
 
       const data = await recipe.findAll({
         where: {
-          [Op.or]: {
+          [Op.and]: {
             id_category: cat,
             id_type: type,
           },
+          price : {
+            [Op.between] : [gte, lte]
+          }          
         },
         attributes: {
           exclude: ["createdAt", "updatedAt", "deletedAt"],
@@ -211,6 +218,10 @@ class Recipe {
             model: category,
             attributes: ["name"],
           },
+          {
+            model: location,
+            attributes: ["name"]
+          }
           // {
           //     model: type,
           //     attributes: ["name"]

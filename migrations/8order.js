@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('recipes', {
+    await queryInterface.createTable('orders', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -20,54 +20,30 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER
       },
-      id_ingredient: {
+      id_recipe: {
         allowNull: false,
         type: Sequelize.INTEGER
       },
-      title: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      duration: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      serving: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      image: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      description: {
-        allowNull: true,
-        type: Sequelize.TEXT
-      },
-      direction: {
-        allowNull: true,
-        type: Sequelize.TEXT
-      },
-      ingredient: {
-        allowNull: true,
-        type: Sequelize.JSONB
-      },
-      stock: {
+      quantity: {
         allowNull: true,
         type: Sequelize.INTEGER
       },
-      price: {
+      subtotal: {
         allowNull: true,
         type: Sequelize.INTEGER
       },
-      id_location: {
-        type: Sequelize.INTEGER,
+      uploadReceipt: {
         allowNull: true,
+        type: Sequelize.STRING
       },
-      // location: {
-      //   allowNull: true,
-      //   type: Sequelize.STRING
-      // },
+      deliveryFee: {
+        allowNull: true,
+        type: Sequelize.INTEGER
+      },
+      total: {
+        allowNull: true,
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -79,13 +55,17 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
-      }
+      },
+      id_delivery: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
     });
     // id_category foreign key
-    await queryInterface.addConstraint('recipes', {
+    await queryInterface.addConstraint('orders', {
       fields: ['id_category'],
       type: 'foreign key',
-      name: 'custom_fkey_id_catfdfRecipe',
+      name: 'custom_fkey_id_categoryOrder',
       references: {
         //Required field
         table: 'categories',
@@ -96,10 +76,10 @@ module.exports = {
     });
 
     // id_user foreign key
-    await queryInterface.addConstraint('recipes', {
+    await queryInterface.addConstraint('orders', {
       fields: ['id_user'],
       type: 'foreign key',
-      name: 'custom_fkey_id_usefdfrRecipe',
+      name: 'custom_fkey_id_userOrder',
       references: {
         //Required field
         table: 'users',
@@ -110,10 +90,10 @@ module.exports = {
     });
 
     // id_type foreign key
-    await queryInterface.addConstraint('recipes', {
+    await queryInterface.addConstraint('orders', {
         fields: ['id_type'],
         type: 'foreign key',
-        name: 'custom_fkey_id_typdfdeRecipe',
+        name: 'custom_fkey_id_typeOrder',
         references: {
           //Required field
           table: 'types',
@@ -123,22 +103,35 @@ module.exports = {
         onUpdate: 'cascade',
       });
 
-          // id_location foreign key
-    await queryInterface.addConstraint('recipes', {
-      fields: ['id_location'],
+     // id_recipe foreign key
+    await queryInterface.addConstraint('orders', {
+        fields: ['id_recipe'],
+        type: 'foreign key',
+        name: 'custom_fkey_id_recipeOrder',
+        references: {
+          //Required field
+          table: 'recipes',
+          field: 'id',
+        },
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      });
+
+     // id_delivery foreign key
+    await queryInterface.addConstraint('orders', {
+      fields: ['id_delivery'],
       type: 'foreign key',
-      name: 'custom_fkey_id_locadfdftionRecipe',
+      name: 'custom_fkey_id_deliveryorder',
       references: {
         //Required field
-        table: 'locations',
+        table: 'deliveries',
         field: 'id',
       },
       onDelete: 'cascade',
       onUpdate: 'cascade',
     });
-
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('recipes');
+    await queryInterface.dropTable('orders');
   }
 };

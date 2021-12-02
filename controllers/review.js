@@ -12,8 +12,9 @@ class Review {
       })
 
       if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to delete it."]})
+          return res.status(401).json({ success: false, errors: ["You must have permission to access."]})
       }
+
       const data = await review.findAll({
         where: {
           id_recipe: +idRecipe
@@ -23,22 +24,26 @@ class Review {
         },
         include: [
           {
-              model: user,
-              attributes: ["userName"],
+            model: user,
+            attributes: ["userName"],
+          },
+          {
+            model: user,
+            attributes: ["image"],
           },
           {
             model: recipe,
             attributes: ["title"],
           },
           {
-              model: category,
-              attributes: ["name"],
+            model: category,
+            attributes: ["name"],
           },
           {
-              model: type,
-              attributes: ["name"]
-          },
-      ],   
+            model: type,
+            attributes: ["name"]
+          }
+        ],   
         order: [['id', 'DESC']]
       });
 
@@ -65,7 +70,7 @@ class Review {
       })
 
       if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to delete it."]})
+          return res.status(401).json({ success: false, errors: ["You must have permission to access."]})
       }
 
       const updateData = await review.update(
@@ -100,7 +105,7 @@ class Review {
       })
 
       if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to delete it."]})
+          return res.status(401).json({ success: false, errors: ["You must have permission to access.."]})
       }
 
       const data = await review.findOne({
@@ -113,20 +118,24 @@ class Review {
         },
         include: [
           {
-              model: user,
-              attributes: ["userName"],
+            model: user,
+            attributes: ["userName"],
+          },
+          {
+            model: user,
+            attributes: ["image"],
           },
           {
             model: recipe,
             attributes: ["title"],
           },
           {
-              model: category,
-              attributes: ["name"],
+            model: category,
+            attributes: ["name"],
           },
           {
-              model: type,
-              attributes: ["name"]
+            model: type,
+            attributes: ["name"]
           },
       ],  
       });
@@ -152,7 +161,7 @@ class Review {
       })
 
       if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to delete it."]})
+          return res.status(401).json({ success: false, errors: ["You must have permission to access."]})
       }
 
       const getRecipe = await recipe.findOne({
@@ -177,10 +186,7 @@ class Review {
         // createdAt: moment().startOf('hour').fromNow()
       });
 
-      res.status(201).json({
-        success: true,
-        message: ["Congrats! You have successfully submitted a Review"],
-      });
+      res.status(201).json({ success: true, message: ["Congrats! You have successfully submitted a Review"] });
     } catch (error) {
       console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
@@ -197,7 +203,7 @@ class Review {
       })
 
       if (checkUser.id !== userId) {
-          return res.status(401).json({ success: false, errors: ["You must have permission to delete it."]})
+          return res.status(401).json({ success: false, errors: ["You must have permission to access."]})
       }
 
       const deleteData = await review.destroy({ 
@@ -207,9 +213,7 @@ class Review {
         } 
       });
 
-      res
-        .status(200)
-        .json({ success: true, message: ["Success delete your Review!"] });
+      res.status(200).json({ success: true, message: ["Success delete your Review!"] });
     } catch (error) {
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }

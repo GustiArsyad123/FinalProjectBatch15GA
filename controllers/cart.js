@@ -21,6 +21,16 @@ class Cart {
         attributes: {
           exclude: ["createdAt", "updatedAt", "deletedAt"],
         },
+        include: [
+          {
+            model: recipe,
+            attributes: ["title"],
+          },
+          {
+            model: recipe,
+            attributes: ["price"],
+          },
+        ]
       });
       if (data.length == 0) {
         return res
@@ -80,16 +90,10 @@ class Cart {
       }
       const deletedData = await cart.destroy({
         where: {
-          id_recipe: +idRecipe,
+          id: +idRecipe,
         },
         force: true,
       });
-
-      if (deletedData.id !== +userId) {
-        return res
-          .status(404)
-          .json({ success: false, message: ["Recipe has been deleted"] });
-      }
 
       res
         .status(200)

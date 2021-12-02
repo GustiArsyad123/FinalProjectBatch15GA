@@ -39,10 +39,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      id_location: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
       location: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -62,6 +58,10 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE,
+      },
+      id_location: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
     });
 

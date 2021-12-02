@@ -1,4 +1,5 @@
 const express = require("express");
+const { uploadReceiptValidator } = require("../middlewares/validators/uploadReceiptValidator");
 const { authentication } = require("../middlewares/Auth/authentication");
 
 const {
@@ -12,9 +13,9 @@ const {
 const router = express.Router();
 
 router.get("/", authentication, getCheckout);
-router.post("/", authentication, createPayment);
-router.patch("/delivery", authentication, editAddressDelivery);
-router.put("/", authentication, confirmPayment);
-router.put("/", authentication, updateReceipt);
+router.post("/", uploadReceiptValidator, authentication, createPayment);
+router.patch("/:idDelivery", authentication, editAddressDelivery);
+router.get("/confirmpayment", authentication, confirmPayment);
+router.put("/", uploadReceiptValidator, authentication, updateReceipt);
 
 module.exports = router;

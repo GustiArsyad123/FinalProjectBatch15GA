@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
       models.order.belongsTo(models.delivery, {
         foreignKey: "id_delivery",
       });
+      models.order.hasMany(models.seller, {
+        foreignKey: "id_order",
+      });
 
       // define association here
     }
@@ -33,12 +36,12 @@ module.exports = (sequelize, DataTypes) => {
       id_user: DataTypes.INTEGER,
       id_recipe: DataTypes.INTEGER,
       id_type: DataTypes.INTEGER,
-      id_delivery: DataTypes.INTEGER,
       quantity: DataTypes.INTEGER,
       subtotal: DataTypes.INTEGER,
       uploadReceipt: DataTypes.STRING,
       deliveryFee: DataTypes.INTEGER,
-      total: DataTypes.INTEGER
+      total: DataTypes.INTEGER,
+      id_delivery: DataTypes.INTEGER,
     },
     {
       sequelize,

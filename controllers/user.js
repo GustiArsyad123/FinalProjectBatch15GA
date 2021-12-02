@@ -55,6 +55,7 @@ class User {
         res.status(200).json({ success: true, data: data, token: token });
 
     } catch (error) {
+      console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }

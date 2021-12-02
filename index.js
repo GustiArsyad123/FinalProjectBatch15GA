@@ -1,10 +1,10 @@
 require("dotenv").config();
 const express = require("express");
-const session = require("express-session");
-const passport = require("passport");
-const FacebookStrategy = require("passport-facebook").Strategy;
-const routes = require("./routes.js");
-const config = require("./config");
+// const session = require("express-session");
+// const passport = require("passport");
+// const FacebookStrategy = require("passport-facebook").Strategy;
+// const routes = require("./routes.js");
+// const config = require("./config");
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
 const cors = require("cors");
