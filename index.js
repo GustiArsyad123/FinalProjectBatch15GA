@@ -15,6 +15,7 @@ const port = process.env.PORT || 3000;
 const user = require("./routes/user");
 const recipe = require("./routes/recipe");
 const review = require("./routes/review");
+const rating = require("./routes/rating");
 const order = require("./routes/order");
 const cart = require("./routes/cart");
 const errorHandler = require("./middlewares/errorHandler/errorHandler");
@@ -75,6 +76,7 @@ app.get("/", (req, res) => {
 app.use("/user", user);
 app.use("/recipe", recipe);
 app.use("/review", review);
+app.use("/rating", rating)
 app.use("/order", order);
 app.use("/cart", cart);
 

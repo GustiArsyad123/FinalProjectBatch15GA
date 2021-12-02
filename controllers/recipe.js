@@ -1,4 +1,4 @@
-const { category, user, type, recipe, review, location } = require("../models");
+const { category, user, type, recipe, review, location, rating } = require("../models");
 const { Op } = require("sequelize");
 const { gte } = require("sequelize/dist/lib/operators");
 
@@ -131,7 +131,7 @@ class Recipe {
   async createRecipeFour(req, res, next) {
     try {
       const userId = req.userData.id;
-      const { price, stock, location } = req.body;
+      const { price, stock, id_location } = req.body;
       const checkUser = await user.findOne({
         where: { id: userId },
       });
@@ -149,7 +149,7 @@ class Recipe {
         {
           price,
           stock,
-          location,
+          id_location,
         },
         {
           where: { id: req.params.id },
@@ -266,12 +266,23 @@ class Recipe {
         offset: (+page - 1) * parseInt(limit),
       });
 
+      // const sumRatings = await rating.sum("value", {
+      //   where: { id_recipe: req.params.id },
+      // });
+
+      // const countRatings = await rating.count({
+      //   where: { id_recipe: req.params.id },
+      // });
+
+      // const averageRatings = sumRatings / countRatings;
+
       if (data == null) {
         return res.status(404).json({ success: false, errors: ["Recipe not found"] });
       }
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
@@ -315,7 +326,7 @@ class Recipe {
         ],
       });
 
-      const comment = await review.findAll({
+      const allComments = await review.findAll({
         include: [{ model: user, attributes: ["userName", "image"] }],
         where: { id_recipe: req.params.id },
         attributes: {
@@ -324,13 +335,32 @@ class Recipe {
         },
       });
 
+      const allRatings = await rating.findAll({
+        include: [{ model: user, attributes: ["userName", "image"] }],
+        where: { id_recipe: req.params.id },
+        attributes: {
+          include: ["value"],
+          exclude: ["deletedAt"],
+        },
+      });
+
+      const sumRatings = await rating.sum("value", {
+        where: { id_recipe: req.params.id },
+      });
+
+      const countRatings = await rating.count({
+        where: { id_recipe: req.params.id },
+      });
+
+      const averageRatings = sumRatings / countRatings;
+
       if (data == null) {
         return res
           .status(404)
           .json({ success: false, errors: ["Recipe not found"] });
       }
 
-      res.status(200).json({ success: true, data: data, comment });
+      res.status(200).json({ success: true, data: data, allComments, averageRatings, allRatings });
     } catch (error) {
       console.log(error);
       res

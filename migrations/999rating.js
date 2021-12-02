@@ -14,7 +14,7 @@ module.exports = {
       id_recipe: {
         type: Sequelize.INTEGER,
       },
-      rating: {
+      value: {
         type: Sequelize.INTEGER,
       },
       createdAt: {

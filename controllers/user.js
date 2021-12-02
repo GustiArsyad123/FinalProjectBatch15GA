@@ -1,6 +1,9 @@
 const { user, location } = require("../models");
 const { createToken, encodePin, compare } = require("../utils/index");
 const sequelize = require("sequelize");
+const nodemailer = require("nodemailer");
+const hbs = require("nodemailer-express-handlebars");
+const path = require("path")
 
 class User {
   async getDetailUser(req, res, next) {
@@ -56,6 +59,52 @@ class User {
       };
       const token = createToken(payload);
 
+      /* Function to send welcome email to new user */
+      var transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+          user: "chefbox2021@gmail.com",
+          pass: "Bantenku1",
+        },
+      });
+
+      transporter.use(
+        "compile",
+        hbs({
+          viewEngine: {
+            extname: ".hbs", // handlebars extension
+            partialsDir: "./templates/",
+            layoutsDir: "./templates/",
+            defaultLayout: "regis",
+          },
+          viewPath: "./templates/",
+          extName: ".hbs",
+        })
+      );
+
+      transporter.verify(function (error, success) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Server is ready to take our messages");
+          console.log(success);
+        }
+      });
+
+      let mailOptions = {
+        from: 'chefbox2021@gmail.com',
+        to: data.dataValues.email,
+        subject: 'Message',
+        template: 'regis',
+        context: {
+          email: data.dataValues.email,
+          userName: data.dataValues.userName,
+        }
+      }
+
+      transporter.sendMail(mailOptions, (err, info) => {
+      });
+    
       res.status(200).json({ success: true, data: data, token: token });
     } catch (error) {
       console.log(error);

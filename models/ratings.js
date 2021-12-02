@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     {
         id_user: DataTypes.INTEGER,
         id_recipe: DataTypes.INTEGER,
-        rating: DataTypes.INTEGER,
+        value: DataTypes.INTEGER,
     },
     {
       sequelize,
