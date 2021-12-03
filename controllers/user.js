@@ -3,7 +3,7 @@ const { createToken, encodePin, compare } = require("../utils/index");
 const sequelize = require("sequelize");
 const nodemailer = require("nodemailer");
 const hbs = require("nodemailer-express-handlebars");
-const path = require("path")
+const path = require("path");
 
 class User {
   async getDetailUser(req, res, next) {
@@ -26,9 +26,66 @@ class User {
       res.status(200).json({ success: true, data: data });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
+  async loginFb(req, res) {
+    try {
+      const checkEmail = await user.findOne({
+        email: req.user._json.email,
+      });
+      let token;
+      if (checkEmail) {
+        const payload = { data: checkEmail };
+        token = generateToken(payload);
+      } else {
+        let register = await user.create({
+          name: req.user._json.name,
+          facebookId: req.user._json.id,
+          email: req.user._json.email,
+          image: req.user._json.picture.data.url,
+        });
+        const payload = register.dataValues;
+        token = generateToken(payload);
+      }
+
+      return res.status(200).json({
+        status: 200,
+        token,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+
+  async loginGoogle(req, res) {
+    try {
+      const checkEmail = await user.findOne({
+        email: req.user._json.email,
+      });
+      let token;
+      if (checkEmail) {
+        const payload = { data: checkEmail };
+        token = generateToken(payload);
+      } else {
+        let register = await user.create({
+          name: req.user._json.name,
+          email: req.user._json.email,
+          image: req.user._json.picture.data.url,
+        });
+        const payload = register.dataValues;
+        token = generateToken(payload);
+      }
+
+      return res.status(200).json({
+        status: 200,
+        token,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
     }
   }
 
@@ -92,25 +149,22 @@ class User {
       });
 
       let mailOptions = {
-        from: 'chefbox2021@gmail.com',
+        from: "chefbox2021@gmail.com",
         to: data.dataValues.email,
-        subject: 'Message',
-        template: 'regis',
+        subject: "Message",
+        template: "regis",
         context: {
           email: data.dataValues.email,
           userName: data.dataValues.userName,
-        }
-      }
+        },
+      };
 
-      transporter.sendMail(mailOptions, (err, info) => {
-      });
-    
+      transporter.sendMail(mailOptions, (err, info) => {});
+
       res.status(200).json({ success: true, data: data, token: token });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -134,14 +188,10 @@ class User {
         ],
       });
 
-      res
-        .status(201)
-        .json({ success: true, message: ["Success Update Data"], data: data });
+      res.status(201).json({ success: true, message: ["Success Update Data"], data: data });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -162,9 +212,7 @@ class User {
       res.status(201).json({ success: true, message: ["Success Update Data"] });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -196,13 +244,9 @@ class User {
         },
       });
 
-      res
-        .status(201)
-        .json({ success: true, message: ["Success Update Password"] });
+      res.status(201).json({ success: true, message: ["Success Update Password"] });
     } catch (error) {
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -217,18 +261,12 @@ class User {
       });
 
       if (deletedData.id !== +userId) {
-        return res
-          .status(404)
-          .json({ success: false, message: ["User has been deleted"] });
+        return res.status(404).json({ success: false, message: ["User has been deleted"] });
       }
 
-      res
-        .status(200)
-        .json({ success: true, message: ["Success deleting data"] });
+      res.status(200).json({ success: true, message: ["Success deleting data"] });
     } catch (error) {
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -272,9 +310,7 @@ class User {
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, errors: ["Internal Server Error"] });
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 }
