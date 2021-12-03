@@ -19,6 +19,7 @@ const review = require("./routes/review");
 const order = require("./routes/order");
 const cart = require("./routes/cart");
 const errorHandler = require("./middlewares/errorHandler/errorHandler");
+const authFacebook = require("./middlewares/Auth/authFacebook");
 
 app.use(cors());
 app.use(express.json());
@@ -78,6 +79,10 @@ app.use("/recipe", recipe);
 app.use("/review", review);
 app.use("/order", order);
 app.use("/cart", cart);
+
+app.use(passport.initialize());
+app.use(passports.initialize());
+app.use(passport.session());
 
 app.get("*", (req, res, next) => {
   res.send("404 Page Not Found");
