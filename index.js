@@ -19,15 +19,15 @@ const review = require("./routes/review");
 const order = require("./routes/order");
 const cart = require("./routes/cart");
 const errorHandler = require("./middlewares/errorHandler/errorHandler");
-const authFacebook = require("./middlewares/Auth/authFacebook");
+// const authFacebook = require("./middlewares/Auth/authFacebook");
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(express.static("public"));
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // Faceook Oauth
 // app.set("view engine", "ejs");
@@ -39,6 +39,8 @@ app.use(passport.session());
 //     secret: "SECRET",
 //   })
 // );
+
+// 
 
 // app.use(passport.initialize());
 // app.use(passport.session());

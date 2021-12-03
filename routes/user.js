@@ -5,6 +5,7 @@ const { signInValidator } = require("../middlewares/validators/signInValidator")
 const { updateUserValidator } = require("../middlewares/validators/updateUserValidator");
 const { authentication } = require("../middlewares/Auth/authentication");
 const passport = require("../middlewares/Auth/authFacebook");
+// const passport = require("passport");
 
 const { createUser, getDetailUser, updateUser, deleteUser, login, loginFb, updatePassword, completeSignUp } = require("../controllers/user");
 // const passport = require("passport");
