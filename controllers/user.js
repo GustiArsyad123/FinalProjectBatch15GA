@@ -4,6 +4,7 @@ const sequelize = require("sequelize");
 const nodemailer = require("nodemailer");
 const hbs = require("nodemailer-express-handlebars");
 const path = require("path");
+const crypto = require("crypto");
 
 class User {
   async getDetailUser(req, res, next) {
@@ -30,37 +31,107 @@ class User {
     }
   }
 
-  async loginFb(req, res) {
+  async loginFb(req, res, next) {
     try {
       const checkEmail = await user.findOne({
         email: req.user._json.email,
       });
-      let token;
+
       if (checkEmail) {
-        const payload = { data: checkEmail };
-        token = generateToken(payload);
+
+        const payload = {
+          id: checkEmail.dataValues.id,
+          userName: checkEmail.dataValues.userName,
+          email: checkEmail.dataValues.email,
+        };
+
+        let token = createToken(payload);
+
+        return res.status(200).json({
+          success: true,
+          token,
+        });
       } else {
+        let emailFacebook = req.user._json.email
+        let splitEmail = emailFacebook.split('@')
+        
         let register = await user.create({
-          name: req.user._json.name,
+          firstName: req.user._json.name,
           facebookId: req.user._json.id,
           email: req.user._json.email,
-          image: req.user._json.picture.data.url,
+          userName: splitEmail[0] + Math.random(),
+          password: crypto.randomBytes(16).toString("hex")
         });
-        const payload = register.dataValues;
-        token = generateToken(payload);
+
+        const payload = {
+          id: register.dataValues.id,
+          userName: register.dataValues.userName,
+          email: register.dataValues.email,
+        };
+        let token = createToken(payload);
+
+              /* Function to send welcome email to new user */
+            var transporter = nodemailer.createTransport({
+              service: "Gmail",
+              auth: {
+                user: "chefbox2021@gmail.com",
+                pass: "Bantenku1",
+              },
+            });
+
+            transporter.use(
+              "compile",
+              hbs({
+                viewEngine: {
+                  extname: ".hbs", // handlebars extension
+                  partialsDir: "./templates/",
+                  layoutsDir: "./templates/",
+                  defaultLayout: "regisFacebook",
+                },
+                viewPath: "./templates/",
+                extName: ".hbs",
+              })
+            );
+
+            transporter.verify(function (error, success) {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log("Server is ready to take our messages");
+                console.log(success);
+              }
+            });
+
+            let mailOptions = {
+              from: "chefbox2021@gmail.com",
+              to: data.dataValues.email,
+              subject: "Message",
+              template: "regisFacebook",
+              context: {
+                email: register.dataValues.email,
+                userName: register.dataValues.userName,
+                password: register.dataValues.password
+              },
+            };
+
+            transporter.sendMail(mailOptions, (err, info) => {});
+
+        return res.status(200).json({
+          success: true,
+          token,
+        });
       }
 
-      return res.status(200).json({
-        status: 200,
-        token,
-      });
     } catch (error) {
       console.log(error);
-      next(error);
+      res.status(500).json({
+        success: false,
+        errors: ["Internal server error"]
+      });
     }
   }
 
-  async loginGoogle(req, res) {
+  async loginGoogle(req, res, next) {
     try {
       const checkEmail = await user.findOne({
         email: req.user._json.email,

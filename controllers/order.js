@@ -314,6 +314,53 @@ class Order {
         }
       }
 
+      /* Function to send welcome email to new user */
+      var transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+          user: "chefbox2021@gmail.com",
+          pass: "Bantenku1",
+        },
+      });
+
+      transporter.use(
+        "compile",
+        hbs({
+          viewEngine: {
+            extname: ".hbs", // handlebars extension
+            partialsDir: "./templates/",
+            layoutsDir: "./templates/",
+            defaultLayout: "invoice",
+          },
+          viewPath: "./templates/",
+          extName: ".hbs",
+        })
+      );
+
+      transporter.verify(function (error, success) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Server is ready to take our messages");
+          console.log(success);
+        }
+      });
+
+      let mailOptions = {
+        from: 'chefbox2021@gmail.com',
+        to: data.dataValues.email,
+        subject: 'Message',
+        template: 'invoice',
+        context: {
+          email: data.dataValues.email,
+          userName: data.dataValues.userName,
+        }
+      }
+
+      transporter.sendMail(mailOptions, (err, info) => {
+      });
+
+      /* Empty cart and order table after confirmed */
       const emptyDelivery = await delivery.destroy({
         where: { usernya: +userId },
       });

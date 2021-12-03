@@ -14,7 +14,7 @@ passport.use(
     {
       clientID: process.env.CLIENT_ID_FB_AUTH,
       clientSecret: process.env.CLIENT_SECRET_FB_AUTH,
-      callbackURL: "http://chefbox2021.herokuapp.com/facebook/callback",
+      callbackURL: "http://chefbox2021.herokuapp.com/user/facebook/callback",
       profileFields: ["id", "displayName", "name", "gender", "picture.type(large)", "email"],
     },
     function (accessToken, refreshToken, profile, cb) {

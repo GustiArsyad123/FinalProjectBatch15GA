@@ -4,9 +4,10 @@ const { signUpCompleteValidator } = require("../middlewares/validators/signUpCom
 const { signInValidator } = require("../middlewares/validators/signInValidator");
 const { updateUserValidator } = require("../middlewares/validators/updateUserValidator");
 const { authentication } = require("../middlewares/Auth/authentication");
+const passport = require("../middlewares/Auth/authFacebook");
 
 const { createUser, getDetailUser, updateUser, deleteUser, login, loginFb, updatePassword, completeSignUp } = require("../controllers/user");
-const passport = require("passport");
+// const passport = require("passport");
 
 const router = express.Router();
 
@@ -21,13 +22,7 @@ router.delete("/", authentication, deleteUser);
 router.get("/failedFacebook", (req, res) => {
   res.send("Failed to login Facebook, please try again.");
 });
-router.get("/facebook", passport.authenticate("facebook", { scoupe: ["email"] }));
-router.get(
-  "/facebook/callback",
-  passport.authenticate("facebook", {
-    failureRedirect: "/api/v1/users/failedFacebook",
-  }),
-  loginFb
-);
+router.get("/facebook", passport.authenticate("facebook", { scope: ["email"] }));
+router.get("/facebook/callback", passport.authenticate("facebook"), loginFb);
 
 module.exports = router;
