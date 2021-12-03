@@ -26,6 +26,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(express.static("public"));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Faceook Oauth
 // app.set("view engine", "ejs");
@@ -79,10 +81,6 @@ app.use("/recipe", recipe);
 app.use("/review", review);
 app.use("/order", order);
 app.use("/cart", cart);
-
-app.use(passport.initialize());
-app.use(passports.initialize());
-app.use(passport.session());
 
 app.get("*", (req, res, next) => {
   res.send("404 Page Not Found");
