@@ -1,6 +1,10 @@
 const FacebookStrategy = require("passport-facebook").Strategy;
 const passport = require("passport");
 
+app.use(passport.initialize());
+app.use(passports.initialize());
+app.use(passport.session());
+
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
