@@ -46,7 +46,7 @@ passport.use(
     {
       clientID: "431200265283732",
       clientSecret: "886b3a136b0724f2b9585fd85eb9f83a",
-      callbackURL: "http://chefbox2021.herokuapp.com/user/facebook",
+      callbackURL: "https://chefbox2021.herokuapp.com/user/facebook",
       profileFields: [
         "id",
         "displayName",
@@ -125,7 +125,7 @@ passport.use(
       clientID:
         "622026911045-f3r27uj8ka75p6s4iv7eagpmv0vdlll8.apps.googleusercontent.com",
       clientSecret: "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",
-      callbackURL: "http://localhost:3000/user/google",
+      callbackURL: "https://chefbox2021.herokuapp.com/user/google",
     },
     async function (accessToken, refreshToken, profile, done) {
       try {
