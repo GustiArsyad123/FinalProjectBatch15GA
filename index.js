@@ -4,8 +4,6 @@ const session = require("express-session");
 const passport = require("passport");
 const FacebookStrategy = require("passport-facebook").Strategy;
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
-// const routes = require("./routes.js");
-// const config = require("./config");
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
 const cors = require("cors");
@@ -19,7 +17,6 @@ const review = require("./routes/review");
 const order = require("./routes/order");
 const cart = require("./routes/cart");
 const errorHandler = require("./middlewares/errorHandler/errorHandler");
-// const authFacebook = require("./middlewares/Auth/authFacebook");
 
 app.use(cors());
 app.use(express.json());
@@ -32,18 +29,14 @@ app.use(express.static("public"));
 // Faceook Oauth
 // app.set("view engine", "ejs");
 
-// app.use(
-//   session({
-//     resave: false,
-//     saveUninitialized: true,
-//     secret: "SECRET",
-//   })
-// );
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: true,
+    secret: "SECRET",
+  })
+);
 
-// 
-
-// app.use(passport.initialize());
-// app.use(passport.session());
 
 // passport.serializeUser(function (user, cb) {
 //   cb(null, user);
