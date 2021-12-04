@@ -44,8 +44,8 @@ passport.use(
   "facebook",
   new FacebookStrategy(
     {
-      clientID: "431200265283732",
-      clientSecret: "886b3a136b0724f2b9585fd85eb9f83a",
+      clientID: "246708500889479",
+      clientSecret: "3f7a44e7149337c6ad443e1fdfc29646",
       callbackURL: "https://chefbox2021.herokuapp.com/user/facebook",
       profileFields: [
         "id",
