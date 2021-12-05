@@ -52,32 +52,33 @@ passport.use(
         "displayName",
         "name",
         "gender",
-        "picture.type(large)",
-        "email",
+        "picture.type(large)"
       ],
     },
     async function (accessToken, refreshToken, profile, done) {
       try {
         console.log(profile);
         const image = profile._json.picture.data.url;
-        const { email, name, id } = profile._json;
-        console.log(email);
+        const { fisrt_name, last_name, id } = profile._json;
 
         let data = await user.findOne({
-          where: { email: email },
+          where: { idfacebook: id },
         });
+        console.log(data);
         let pass = "Abcd123456@";
         pass = encodePin(pass);
         if (data == null) {
           await user.create({
-            firstName: name,
+            firstName: fisrt_name,
+            lastName: last_name,
             userName: id,
-            email,
             image,
-            password: pass, //nanti ini dihapus
+            password: pass,
+            idfacebook: id
           });
 
-          data = await user.findOne({ where: { email: profile.email } });
+          data = await user.findOne({ where: { idfacebook: id } });
+          console.log(data);
         }
         profile = data;
         return done(null, profile, { message: "Login success!" });
