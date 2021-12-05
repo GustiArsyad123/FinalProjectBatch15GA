@@ -41,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       address: DataTypes.STRING,
       image: DataTypes.STRING,
       id_location: DataTypes.INTEGER,
+      idfacebook: DataTypes.INTEGER
     },
     {
       sequelize,
