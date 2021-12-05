@@ -63,6 +63,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      idfacebook: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
     });
 
     await queryInterface.addConstraint('users', {

@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const { user } = require("../models");
 const { encodePin } = require("../utils/bcrypt");
+const { createToken } = require("../utils/index");
 
 passport.serializeUser(function (user, cb) {
   cb(null, user);
@@ -26,12 +27,20 @@ exports.facebook = (req, res, next) => {
 
     req.user = user;
 
-    const token = jwt.sign(
-      {
-        user: req.user,
-      },
-      process.env.SECRET
-    );
+    // const token = jwt.sign(
+    //   {
+    //     user: req.user,
+    //   },
+    //   process.env.SECRET
+    // );
+
+    const payload = {
+      id: req.user.id,
+      userName: req.user.id,
+      email: req.user.id,
+      idfacebook: req.user.idfacebook
+    };
+    const token = createToken(payload);
 
     return res.status(200).json({
       message: "Success",
