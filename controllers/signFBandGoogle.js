@@ -58,11 +58,13 @@ passport.use(
     },
     async function (accessToken, refreshToken, profile, done) {
       try {
+        console.log(profile);
         const image = profile._json.picture.data.url;
         const { email, name, id } = profile._json;
+        console.log(email);
 
         let data = await user.findOne({
-          where: { email },
+          where: { email: email },
         });
         let pass = "Abcd123456@";
         pass = encodePin(pass);
