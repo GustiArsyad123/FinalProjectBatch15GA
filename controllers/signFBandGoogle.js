@@ -36,8 +36,8 @@ exports.facebook = (req, res, next) => {
 
     const payload = {
       id: req.user.id,
-      userName: req.user.id,
-      email: req.user.id,
+      userName: req.user.idfacebook,
+      email: req.user.idfacebook,
       idfacebook: req.user.idfacebook
     };
     const token = createToken(payload);
@@ -116,12 +116,19 @@ exports.google = (req, res, next) => {
 
       req.user = user;
 
-      const token = jwt.sign(
-        {
-          user: req.user,
-        },
-        process.env.SECRET
-      );
+      // const token = jwt.sign(
+      //   {
+      //     user: req.user,
+      //   },
+      //   process.env.SECRET
+      // );
+
+      const payload = {
+        id: req.user.id,
+        userName: req.user.userName,
+        email: req.user.email
+      };
+      const token = createToken(payload);
 
       return res.status(200).json({
         message: "Success",
