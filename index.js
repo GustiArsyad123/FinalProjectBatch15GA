@@ -29,13 +29,13 @@ app.use(express.static("public"));
 // Faceook Oauth
 // app.set("view engine", "ejs");
 
-app.use(
-  session({
-    resave: false,
-    saveUninitialized: true,
-    secret: "SECRET",
-  })
-);
+// app.use(
+//   session({
+//     resave: false,
+//     saveUninitialized: true,
+//     secret: "SECRET",
+//   })
+// );
 
 
 // passport.serializeUser(function (user, cb) {
