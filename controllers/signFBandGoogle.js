@@ -73,6 +73,7 @@ passport.use(
             lastName: last_name,
             userName: id,
             image,
+            email: id,
             password: pass,
             idfacebook: id
           });
