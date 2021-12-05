@@ -149,12 +149,14 @@ passport.use(
     },
     async function (accessToken, refreshToken, profile, done) {
       try {
+        console.log(profile);
         const image = profile.photos.value;
         const { email, name, sub } = profile._json;
 
         let data = await user.findOne({
           where: { email },
         });
+        console.log("INI DATA", data);
 
         if (data == null) {
           await user.create({
