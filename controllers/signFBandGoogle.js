@@ -150,23 +150,26 @@ passport.use(
     async function (accessToken, refreshToken, profile, done) {
       try {
         console.log(profile);
-        const image = profile.photos.value;
-        const { email, name, sub } = profile._json;
+        // const image = profile.photos.value;
+        const { email, name, sub, picture } = profile._json;
 
         let data = await user.findOne({
-          where: { email },
+          where: { userName: sub },
         });
-        console.log("INI DATA", data);
-
+        
+        let pass = "Abcd123456@";
+        pass = encodePin(pass);
         if (data == null) {
           await user.create({
-            firstName,
+            firstName: name,
             userName: sub,
             email,
-            image,
+            image: picture,
+            password: pass
           });
 
-          data = await user.findOne({ where: { email } });
+          data = await user.findOne({ where: { email: email } });
+          console.log("INI DATA", data);
         }
 
         profile = data;
