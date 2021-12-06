@@ -312,6 +312,10 @@ class Recipe {
             attributes: ["userName"],
           },
           {
+            model: user,
+            attributes: ["image"],
+          },
+          {
             model: category,
             attributes: ["name"],
           },
