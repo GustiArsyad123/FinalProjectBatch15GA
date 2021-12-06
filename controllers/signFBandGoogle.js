@@ -2,6 +2,9 @@ const FacebookStrategy = require("passport-facebook").Strategy;
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
+const nodemailer = require("nodemailer");
+const hbs = require("nodemailer-express-handlebars");
+const path = require("path");
 const { user } = require("../models");
 const { encodePin } = require("../utils/bcrypt");
 const { createToken } = require("../utils/index");
@@ -26,13 +29,6 @@ exports.facebook = (req, res, next) => {
     }
 
     req.user = user;
-
-    // const token = jwt.sign(
-    //   {
-    //     user: req.user,
-    //   },
-    //   process.env.SECRET
-    // );
 
     const payload = {
       id: req.user.id,
@@ -66,14 +62,14 @@ passport.use(
     },
     async function (accessToken, refreshToken, profile, done) {
       try {
-        console.log(profile);
+ 
         const image = profile._json.picture.data.url;
         const { fisrt_name, last_name, id } = profile._json;
 
         let data = await user.findOne({
           where: { idfacebook: id },
         });
-        console.log(data);
+
         let pass = "Abcd123456@";
         pass = encodePin(pass);
         if (data == null) {
@@ -88,7 +84,6 @@ passport.use(
           });
 
           data = await user.findOne({ where: { idfacebook: id } });
-          console.log(data);
         }
         profile = data;
         return done(null, profile, { message: "Login success!" });
@@ -116,19 +111,58 @@ exports.google = (req, res, next) => {
 
       req.user = user;
 
-      // const token = jwt.sign(
-      //   {
-      //     user: req.user,
-      //   },
-      //   process.env.SECRET
-      // );
-
       const payload = {
         id: req.user.id,
         userName: req.user.userName,
         email: req.user.email
       };
       const token = createToken(payload);
+
+      /* Function to send welcome email to new user */
+      var transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+          user: "chefbox2021@gmail.com",
+          pass: "Bantenku1",
+        },
+      });
+
+      transporter.use(
+        "compile",
+          hbs({
+            viewEngine: {
+              extname: ".hbs", // handlebars extension
+              partialsDir: "./templates/",
+              layoutsDir: "./templates/",
+              defaultLayout: "regisFacebook",
+          },
+            viewPath: "./templates/",
+            extName: ".hbs",
+        })
+      );
+
+      transporter.verify(function (error, success) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Server is ready to take our messages");
+          console.log(success);
+        }
+      });
+
+      let mailOptions = {
+          from: "chefbox2021@gmail.com",
+          to: req.user.email,
+          subject: "Message",
+          template: "regisFacebook",
+          context: {
+            email: req.user.email,
+            userName: req.user.userName,
+            password: req.user.password
+          },
+      };
+
+      transporter.sendMail(mailOptions, (err, info) => {});
 
       return res.status(200).json({
         message: "Success",
@@ -149,8 +183,6 @@ passport.use(
     },
     async function (accessToken, refreshToken, profile, done) {
       try {
-        console.log(profile);
-        // const image = profile.photos.value;
         const { email, name, sub, picture } = profile._json;
 
         let data = await user.findOne({
@@ -169,7 +201,6 @@ passport.use(
           });
 
           data = await user.findOne({ where: { email: email } });
-          console.log("INI DATA", data);
         }
 
         profile = data;
