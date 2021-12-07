@@ -173,6 +173,7 @@ class Recipe {
         limit = 6,
         cat = 5,
         type = 1,
+        loc = 1,
         orders = "createdAt",
         sort = "ASC",
         gte = 0,
@@ -184,6 +185,7 @@ class Recipe {
           [Op.and]: {
             id_category: cat,
             id_type: type,
+            id_location: loc
           },
           price: {
             [Op.between]: [gte, lte],
@@ -266,16 +268,6 @@ class Recipe {
         offset: (+page - 1) * parseInt(limit),
       });
 
-      // const sumRatings = await rating.sum("value", {
-      //   where: { id_recipe: req.params.id },
-      // });
-
-      // const countRatings = await rating.count({
-      //   where: { id_recipe: req.params.id },
-      // });
-
-      // const averageRatings = sumRatings / countRatings;
-
       if (data == null) {
         return res.status(404).json({ success: false, errors: ["Recipe not found"] });
       }
@@ -326,7 +318,7 @@ class Recipe {
           {
             model: location,
             attributes: ["name"],
-          },
+          }
         ],
       });
 
