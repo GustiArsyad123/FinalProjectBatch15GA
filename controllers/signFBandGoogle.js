@@ -118,52 +118,6 @@ exports.google = (req, res, next) => {
       };
       const token = createToken(payload);
 
-      /* Function to send welcome email to new user */
-      var transporter = nodemailer.createTransport({
-        service: "Gmail",
-        auth: {
-          user: "chefbox2021@gmail.com",
-          pass: "Bantenku1",
-        },
-      });
-
-      transporter.use(
-        "compile",
-          hbs({
-            viewEngine: {
-              extname: ".hbs", // handlebars extension
-              partialsDir: "./templates/",
-              layoutsDir: "./templates/",
-              defaultLayout: "regisFacebook",
-          },
-            viewPath: "./templates/",
-            extName: ".hbs",
-        })
-      );
-
-      transporter.verify(function (error, success) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log("Server is ready to take our messages");
-          console.log(success);
-        }
-      });
-
-      let mailOptions = {
-          from: "chefbox2021@gmail.com",
-          to: req.user.email,
-          subject: "Message",
-          template: "regisFacebook",
-          context: {
-            email: req.user.email,
-            userName: req.user.userName,
-            password: req.user.password
-          },
-      };
-
-      transporter.sendMail(mailOptions, (err, info) => {});
-
       return res.status(200).json({
         message: "Success",
         token,
@@ -201,6 +155,52 @@ passport.use(
           });
 
           data = await user.findOne({ where: { email: email } });
+
+          /* Function to send welcome email to new user */
+          var transporter = nodemailer.createTransport({
+            service: "Gmail",
+            auth: {
+              user: "chefbox2021@gmail.com",
+              pass: "Bantenku1",
+            },
+          });
+
+          transporter.use(
+            "compile",
+              hbs({
+                viewEngine: {
+                  extname: ".hbs", // handlebars extension
+                  partialsDir: "./templates/",
+                  layoutsDir: "./templates/",
+                  defaultLayout: "regisFacebook",
+              },
+                viewPath: "./templates/",
+                extName: ".hbs",
+            })
+          );
+
+          transporter.verify(function (error, success) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("Server is ready to take our messages");
+              console.log(success);
+            }
+          });
+
+          let mailOptions = {
+              from: "chefbox2021@gmail.com",
+              to: data.dataValues.email,
+              subject: "Message",
+              template: "regisFacebook",
+              context: {
+                email: data.dataValues.email,
+                userName: data.dataValues.userName,
+                password: "Abcd123456@"
+              },
+          };
+
+          transporter.sendMail(mailOptions, (err, info) => {});
         }
 
         profile = data;

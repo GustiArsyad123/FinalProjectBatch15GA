@@ -62,19 +62,22 @@ class Order {
         });
       }
 
+      /* DETAIL USER DELIVERY */
       const userFirstName = checkUser.dataValues.firstName;
       const userLastName = checkUser.dataValues.lastName;
       const userAddress = checkUser.dataValues.address;
       const userPhoneNumber = checkUser.dataValues.phoneNumber;
 
+      /* FIND DETAIL USER DELIVERY FROM TABEL DELIVERY */
       let findDelivery = await delivery.findOne({
         where: {
           usernya: +userId,
         },
       });
 
+      /* CREATE DETAIL DELIVERY IF NOT FOUND */
       if (findDelivery == undefined) {
-        const addDelivery = await delivery.create({
+        await delivery.create({
           usernya: +userId,
           firstName: userFirstName,
           lastName: userLastName,
@@ -91,7 +94,9 @@ class Order {
           exclude: ["usernya", "createdAt", "deletedAt", "updatedAt"],
         },
       });
+      // add limit 1 order ID & DESC
 
+      /* FIND RECIPES IN CART */
       const cartData = await cart.findAll({
         where: { id_user: +userId },
         attributes: {
@@ -133,38 +138,40 @@ class Order {
       let count = 0;
 
       let titleAndAmount = []
-        for (var i = 0; i < getTitleAmount.length; i++) {
-          if (getTitleAmount[i] != resep) {
-            if (count > 0) {
+      for (var i = 0; i < getTitleAmount.length; i++) {
+        if (getTitleAmount[i] != resep) {
+          if (count > 0) {
               titleAndAmount.push({ title: resep, amount: count })
             }
             resep = getTitleAmount[i];
             count = 1;
-          } else {
+        } else {
             count++;
-          }
         }
-        if (count > 0) {
-          titleAndAmount.push({ title: resep, amount: count })
-    }
+      }
+      if (count > 0) {
+        titleAndAmount.push({ title: resep, amount: count })
+      }
 
-
+      /* Count All Price */
       let priceRecipe = [];
       for (let i = 0; i < cartData.length; i++) {
         priceRecipe.push(cartData[i].recipe.price);
       }
-      priceRecipe = priceRecipe.reduce((a, b) => a + b, 0); // Count All Price
+      priceRecipe = priceRecipe.reduce((a, b) => a + b, 0);
 
       if (cartData.length == 0) {
         return res.status(404).json({ success: false, errors: ["cart is empty"] });
       }
- 
+      
+      /* DISPLAY ORDER (GET FROM => USER DELIVERY & CART) */
       const findOrder = await order.findOne({
         where: {
           id_user: +userId
         }
       })
 
+      /* IF NOT FOUND, CREATE */
       if (!findOrder) {
         const createOrder = await order.create({
           id_user: +userId,
@@ -183,7 +190,7 @@ class Order {
         attributes: {
           exclude: ["id_recipe", "id_category", "id_type", "createdAt", "updatedAt", "deletedAt"]
         }
-      })
+      });
 
       res.status(200).json({
         success: true,
@@ -216,7 +223,7 @@ class Order {
         });
       }
 
-      const updatedData = await delivery.update(req.body, {
+      await delivery.update(req.body, {
         where: { id: idDelivery },
       });
 
@@ -263,7 +270,7 @@ class Order {
             attributes: ["stock"],
           }
         ]
-      })
+      });
 
       for (let i = 0; i < resepDiCart.length; i++) {
         arrayResepDiCart.push(resepDiCart[i].recipe.title);
@@ -298,12 +305,11 @@ class Order {
           amount.push(cnt)
       }
     
-
       /* INI BUAT NYARI QUANTITY PER RESEP DI CART */
       for (let i = 0; i < arrayResepDiCart.length - 1; i++){
         for (let j = 0; j < arrayStock.length; j++) {
           for (let k = 0; k < amount.length; k++) {
-            let updateResep = await recipe.update({
+            await recipe.update({
               stock: parseInt(arrayStock[i]) - parseInt(amount[i])
             },{
               where: {
