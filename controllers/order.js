@@ -212,7 +212,6 @@ class Order {
     try {
       const userId = req.userData.id;
       const { idDelivery } = req.params
-      // const { firstName, lastName, address, phoneNumber } = req.body;
       const checkUser = await user.findOne({
         where: { id: +userId },
       });
