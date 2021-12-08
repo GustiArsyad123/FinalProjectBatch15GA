@@ -38,7 +38,7 @@ class Cart {
           .json({ success: false, errors: ["Cart is Empty"] });
       }
 
-      res.status(200).json({ success: true, data: data });
+      res.status(200).json({ success: true, total: data.length, data: data });
     } catch (error) {
       res
         .status(500)
@@ -50,6 +50,7 @@ class Cart {
     try {
       const userId = req.userData.id;
       const { idRecipe } = req.params;
+      const { quantity } = req.body
       const checkUser = await user.findOne({
         where: { id: userId },
       });
@@ -61,12 +62,25 @@ class Cart {
         });
       }
 
-      await cart.create({
-        id_user: +userId,
-        id_recipe: +idRecipe,
-      });
+      const getPreviousCart = await cart.findAll({
+        where: {
+          id_user: +userId,
+          id_recipe: +idRecipe
+        }
+      })
 
-      res.status(200).json({ success: true, message: ["Success add to cart"] });
+      const total = []
+      for (let i = 0; i < quantity; i++) {
+        let addToCart = await cart.create({
+          id_user: +userId,
+          id_recipe: +idRecipe
+        });
+        total.push(addToCart)
+      }
+
+      const semuaCart = getPreviousCart.length + total.length 
+
+      res.status(200).json({ success: true, message: ["Success add to cart"], AllCart: semuaCart });
     } catch (error) {
       res
         .status(500)

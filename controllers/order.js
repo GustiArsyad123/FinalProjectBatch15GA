@@ -93,8 +93,9 @@ class Order {
         attributes: {
           exclude: ["usernya", "createdAt", "deletedAt", "updatedAt"],
         },
+        order: [['id', 'DESC']],
+        limit: 1
       });
-      // add limit 1 order ID & DESC
 
       /* FIND RECIPES IN CART */
       const cartData = await cart.findAll({
@@ -189,7 +190,9 @@ class Order {
         },
         attributes: {
           exclude: ["id_recipe", "id_category", "id_type", "createdAt", "updatedAt", "deletedAt"]
-        }
+        },
+        order: [['id', 'DESC']],
+        limit: 1
       });
 
       res.status(200).json({
@@ -320,7 +323,7 @@ class Order {
         }
       }
 
-      /* Function to send welcome email to new user */
+      /* Function to send invoice email */
       var transporter = nodemailer.createTransport({
         service: "Gmail",
         auth: {
@@ -366,7 +369,7 @@ class Order {
       transporter.sendMail(mailOptions, (err, info) => {
       });
 
-      /* Empty cart and order table after confirmed */
+      /* Empty cart and delivery table after confirmed */
       const emptyDelivery = await delivery.destroy({
         where: { usernya: +userId },
       });
@@ -401,7 +404,7 @@ class Order {
         });
       }
 
-      const updateReceipt = await order.update(req.body.uploadReceipt, {
+      await order.update(req.body.uploadReceipt, {
         where: { id_user: +userId },
       });
 
