@@ -10,6 +10,8 @@ const {
   updateReceipt,
 } = require("../controllers/order");
 
+const { checkout, callbackURL } = require("../controllers/payment");
+
 const router = express.Router();
 
 router.get("/", authentication, getCheckout);
@@ -17,5 +19,7 @@ router.post("/", uploadReceiptValidator, authentication, createPayment);
 router.patch("/:idDelivery", authentication, editAddressDelivery);
 router.get("/confirmpayment", authentication, confirmPayment);
 router.put("/", uploadReceiptValidator, authentication, updateReceipt);
+router.post('/checkout',  checkout)
+router.get('/xendit-cb',  callbackURL)
 
 module.exports = router;
