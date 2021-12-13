@@ -30,16 +30,42 @@ class Cart {
             model: recipe,
             attributes: ["price"],
           },
+          {
+            model: recipe,
+            attributes: ["image"],
+          }
         ]
       });
+ 
+      const finalData = []
+      for(let i = 0 ; i < data.length ; i++) {
+        const obj = {
+          title : data[i].recipe.title,
+          price : data[i].recipe.price,
+          image: data[i].recipe.image,
+          quantity: 1,
+          total : data[i].recipe.price
+        }
+        const idx = finalData.findIndex(el => el.title === data[i].recipe.title )
+        if(idx >= 0 ) {
+          finalData[idx].quantity++
+          finalData[idx].total = finalData[idx].quantity * finalData[idx].price
+        }else {
+          finalData.push(obj)
+        }
+      
+      }
+      console.log(finalData)
+
       if (data.length == 0) {
         return res
           .status(404)
           .json({ success: false, errors: ["Cart is Empty"] });
       }
 
-      res.status(200).json({ success: true, total: data.length, data: data });
+      res.status(200).json({ success: true, total: data.length, data: finalData });
     } catch (error) {
+      console.log(error);
       res
         .status(500)
         .json({ success: false, errors: ["Internal Server Error"] });

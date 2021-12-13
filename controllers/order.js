@@ -126,45 +126,35 @@ class Order {
           }
         ],
       });
- 
-      let titleRecipe = [];
-      for (let i = 0; i < cartData.length; i++) {
-        titleRecipe.push(cartData[i].recipe.title);
-      }
 
-      let getTitleAmount = titleRecipe;
-      getTitleAmount.sort();
-
-      let resep = null;
-      let count = 0;
-
-      let titleAndAmount = []
-      for (var i = 0; i < getTitleAmount.length; i++) {
-        if (getTitleAmount[i] != resep) {
-          if (count > 0) {
-              titleAndAmount.push({ title: resep, amount: count })
-            }
-            resep = getTitleAmount[i];
-            count = 1;
-        } else {
-            count++;
+      const finalData = []
+      for(let i = 0 ; i < cartData.length ; i++) {
+        const obj = {
+          title : cartData[i].recipe.title,
+          price : cartData[i].recipe.price,
+          image: cartData[i].recipe.image,
+          quantity: 1,
+          total : cartData[i].recipe.price
+        }
+        const idx = finalData.findIndex(el => el.title === cartData[i].recipe.title )
+        if(idx >= 0 ) {
+          finalData[idx].quantity++
+          finalData[idx].total = finalData[idx].quantity * finalData[idx].price
+        }else {
+          finalData.push(obj)
         }
       }
-      if (count > 0) {
-        titleAndAmount.push({ title: resep, amount: count })
+
+      let allPrice = []
+      for(let i = 0; i < finalData.length; i++){
+        allPrice.push(finalData[i].total)
       }
 
-      /* Count All Price */
-      let priceRecipe = [];
-      for (let i = 0; i < cartData.length; i++) {
-        priceRecipe.push(cartData[i].recipe.price);
+      let totalPrice = 0
+      for(let i = 0; i <allPrice.length; i++){
+        totalPrice += allPrice[i];
       }
-      priceRecipe = priceRecipe.reduce((a, b) => a + b, 0);
-
-      if (cartData.length == 0) {
-        return res.status(404).json({ success: false, errors: ["cart is empty"] });
-      }
-      
+       
       /* DISPLAY ORDER (GET FROM => USER DELIVERY & CART) */
       const findOrder = await order.findOne({
         where: {
@@ -178,9 +168,9 @@ class Order {
           id_user: +userId,
           id_delivery: getDelivery.dataValues.id,
           quantity: cartData.length,
-          subtotal: priceRecipe,
+          subtotal: totalPrice,
           deliveryFee: 15000,
-          total: priceRecipe + 15000,
+          total: totalPrice + 15000,
         })
       };
 
@@ -197,10 +187,9 @@ class Order {
 
       res.status(200).json({
         success: true,
-        user: getDelivery,
-        quantityPerReceipt: titleAndAmount,
-        order: getOrder,
-        cart: cartData,
+        detailDelivery: getDelivery,
+        detailOrder: getOrder,
+        cart: finalData,
       });
     } catch (error) {
       console.log(error);
