@@ -102,7 +102,7 @@ module.exports = {
       /* Get all title recipe */
       let allDescription = []
       for(let i = 0; i < finalData.length; i++){
-        allDescription.push(' ' + finalData[i].title)
+        allDescription.push(' ' + finalData[i].title + ' @ ' + finalData[i].quantity + 'pcs')
       }
 
       console.log('INI ALL DESCRIPTIN', allDescription[0]);
