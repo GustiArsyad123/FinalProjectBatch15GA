@@ -24,6 +24,10 @@ class Cart {
         include: [
           {
             model: recipe,
+            attributes: ["id"],
+          },
+          {
+            model: recipe,
             attributes: ["title"],
           },
           {
@@ -40,6 +44,7 @@ class Cart {
       const finalData = []
       for(let i = 0 ; i < data.length ; i++) {
         const obj = {
+          id: data[i].recipe.id,
           title : data[i].recipe.title,
           price : data[i].recipe.price,
           image: data[i].recipe.image,
