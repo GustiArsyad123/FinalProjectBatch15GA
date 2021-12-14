@@ -60,7 +60,6 @@ module.exports = {
       let firstName = amountOrder.delivery.firstName
       let lastName = amountOrder.delivery.lastName
       let phone = amountOrder.delivery.phoneNumber
-      let address = amountOrder.delivery.address
 
       /* FIND RECIPES IN CART */
       const cartData = await cart.findAll({
@@ -124,7 +123,7 @@ module.exports = {
       const paymentPayload = {
         external_id: `Invoice-${amountOrder.dataValues.id}`,
         amount: totalPrice,
-        description: allDescription.toString(), // ISI DI CART
+        description: allDescription.toString(),
         should_send_email: false,
         merchant_profile_picture_url: "https://res.cloudinary.com/see-event/image/upload/v1638435431/c4qaz6prwl1zqg4un7ba.png",
         invoice_duration: 7200, // 2 hour
@@ -150,32 +149,36 @@ module.exports = {
   async callbackURL (req, res, next) {
     try {
       console.log(req.body)
+
+      // await order.update(req.body.status,{
+      //   where: {
+      //     id_user
+      //   }, 
+      // })
       /**
       * callback payload from xendit/invoice service 
       {
-        "id": "579c8d61f23fa4ca35e52da4", ------ important
-        "external_id": "invoice_123124123", ------ important
-        "user_id": "5781d19b2e2385880609791c", ------ important
-        "is_high": true,
-        "payment_method": "BANK_TRANSFER", ------ important
-        "status": "PAID", ------ important
-        "merchant_name": "Xendit",
-        "amount": 50000, ------ important
-        "paid_amount": 50000,
-        "bank_code": "PERMATA", ------ important
-        "paid_at": "2016-10-12T08:15:03.404Z", ------ important
-        "payer_email": "wildan@xendit.co",
-        "description": "This is a description", ------ important
-        "adjusted_received_amount": 47500, ------ important
-        "fees_paid_amount": 0,
-        "updated": "2016-10-10T08:15:03.404Z",
-        "created": "2016-10-10T08:15:03.404Z",
-        "currency": "IDR",
-        "payment_channel": "PERMATA", ------ important
-        "payment_destination": "888888888888" ------ important
+        id: '61b89f4e25df117ddd2004f5',     
+        user_id: '61a973c07ab41702fd944898',
+        external_id: 'Invoice-5',
+        is_high: false,
+        status: 'PAID',
+        merchant_name: 'ChefBox',
+        amount: 1756000,
+        created: '2021-12-14T13:42:39.358Z',
+        updated: '2021-12-14T13:55:27.904Z',
+        description: ' Nasi Goreng Pedas @ 6pcs, Spaghetti Bolognesse @ 28pcs',
+        paid_amount: 1756000,
+        fees_paid_amount: 5500,
+        payment_method: 'RETAIL_OUTLET',
+        adjusted_received_amount: 1750500,
+        currency: 'IDR',
+        paid_at: '2021-12-14T13:55:27.7Z',
+        payment_channel: 'INDOMARET',
+        payment_destination: 'TEST262013'
       }
       */
-      res.status(200).send('callback success')
+      res.status(200).json({message: req.body})
     }
     catch(err) {
       console.log(err)

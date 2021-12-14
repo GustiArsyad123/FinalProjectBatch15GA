@@ -20,6 +20,6 @@ router.patch("/:idDelivery", authentication, editAddressDelivery);
 router.get("/confirmpayment", authentication, confirmPayment);
 router.put("/", uploadReceiptValidator, authentication, updateReceipt);
 router.post('/checkout',  checkout)
-router.get('/xendit-cb',  callbackURL)
+router.post('/xendit-cb',  callbackURL)
 
 module.exports = router;

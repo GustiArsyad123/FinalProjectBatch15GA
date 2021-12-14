@@ -108,11 +108,17 @@ class Cart {
         });
         total.push(addToCart)
       }
-
       const semuaCart = getPreviousCart.length + total.length 
 
-      res.status(200).json({ success: true, message: ["Success add to cart"], AllCart: semuaCart });
+      const quantityCart = await cart.findAll({
+        where: {
+          id_user: +userId,
+        }
+      })
+
+      res.status(200).json({ success: true, message: ["Success add to cart"], thisRecipe: semuaCart, totalCart: quantityCart.length });
     } catch (error) {
+      console.log(error);
       res
         .status(500)
         .json({ success: false, errors: ["Internal Server Error"] });

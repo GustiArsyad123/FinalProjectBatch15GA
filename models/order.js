@@ -42,6 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       deliveryFee: DataTypes.INTEGER,
       total: DataTypes.INTEGER,
       id_delivery: DataTypes.INTEGER,
+      ispayment: DataTypes.BOOLEAN,
     },
     {
       sequelize,

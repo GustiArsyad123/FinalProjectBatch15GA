@@ -188,6 +188,7 @@ class Order {
           subtotal: totalPrice,
           deliveryFee: 15000,
           total: totalPrice + 15000,
+          ispayment: false
         })
       } else {
         /* IF FOUND, UPDATE WITH THE NEW DATA IN DATABASE */
