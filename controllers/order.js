@@ -68,15 +68,15 @@ class Order {
       const userAddress = checkUser.dataValues.address;
       const userPhoneNumber = checkUser.dataValues.phoneNumber;
 
-      /* FIND DETAIL USER DELIVERY FROM TABEL DELIVERY */
-      let findDelivery = await delivery.findOne({
+      /* FIND OR CREATE DELIVERY */
+      const getDelivery = await delivery.findOne({
         where: {
           usernya: +userId,
         },
       });
 
       /* CREATE DETAIL DELIVERY IF NOT FOUND */
-      if (findDelivery == undefined) {
+      if (getDelivery == undefined || null) {
         await delivery.create({
           usernya: +userId,
           firstName: userFirstName,
@@ -84,9 +84,23 @@ class Order {
           address: userAddress,
           phoneNumber: userPhoneNumber,
         });
+      } else {
+        /* IF FOUND, UPDATE USER DELIVERY */
+        await delivery.update({
+          firstName: getDelivery.dataValues.firstName,
+          lastName: getDelivery.dataValues.lastName,
+          address: getDelivery.dataValues.address,
+          phoneNumber: getDelivery.dataValues.phoneNumber,
+        },
+        {
+          where: {
+            usernya: +userId,
+        },
+      });
       }
-
-      const getDelivery = await delivery.findOne({
+      
+      /* GET FINAL DATA DELIVERY */
+      const detailDelivery = await delivery.findOne({
         where: {
           usernya: +userId,
         },
@@ -97,7 +111,7 @@ class Order {
         limit: 1
       });
 
-      /* FIND RECIPES IN CART */
+      /* FIND ALL DATA IN CART */
       const cartData = await cart.findAll({
         where: { id_user: +userId },
         attributes: {
@@ -127,6 +141,7 @@ class Order {
         ],
       });
 
+      /* FILTER DUPLICATE RECIPES IN CART */
       const finalData = []
       for(let i = 0 ; i < cartData.length ; i++) {
         const obj = {
@@ -145,22 +160,24 @@ class Order {
         }
       }
 
+      /* GET ALL PRICES IN CART */
       let allPrice = []
       for(let i = 0; i < finalData.length; i++){
         allPrice.push(finalData[i].total)
       }
 
+      /* COUNT ALL PRICES IN CART */
       let totalPrice = 0
       for(let i = 0; i <allPrice.length; i++){
         totalPrice += allPrice[i];
       }
-       
-      /* DISPLAY ORDER (GET FROM => USER DELIVERY & CART) */
+
+      /* FIND OR CREATE ORDER*/
       const findOrder = await order.findOne({
         where: {
           id_user: +userId
         }
-      })
+      });
 
       /* IF NOT FOUND, CREATE */
       if (!findOrder) {
@@ -172,8 +189,24 @@ class Order {
           deliveryFee: 15000,
           total: totalPrice + 15000,
         })
+      } else {
+        /* IF FOUND, UPDATE WITH THE NEW DATA IN DATABASE */
+        await order.update({
+          id_user: +userId,
+          id_delivery: detailDelivery.dataValues.id,
+          quantity: cartData.length,
+          subtotal: totalPrice,
+          deliveryFee: 15000,
+          total: totalPrice + 15000,
+        },
+        {
+          where: {
+            id_user: +userId
+          }
+        })
       };
 
+      /* GET FINAL DATA ORDER */
       const getOrder = await order.findOne({
         where: {
           id_user: +userId
@@ -187,7 +220,7 @@ class Order {
 
       res.status(200).json({
         success: true,
-        detailDelivery: getDelivery,
+        detailDelivery: detailDelivery,
         detailOrder: getOrder,
         cart: finalData,
       });
@@ -375,6 +408,8 @@ class Order {
       res.status(500).json({ success: false, errors: ["Internal Server Error"] });
     }
   }
+
+
 
   async updateReceipt(req, res, next) {
     try {

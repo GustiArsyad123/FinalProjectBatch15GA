@@ -1,9 +1,8 @@
-// integrasi ke payment gateway
 const { verifyToken } = require("../utils/index");
 const { order, cart, user, recipe, delivery } = require('../models')
 
-const XENDIT_URL = process.env.XENDIT_INVOICE // .env
-const XENDIT_KEY = process.env.XENDIT_API_BASE64 // HARUS BASE64 FORMAT, .env
+const XENDIT_URL = process.env.XENDIT_INVOICE
+const XENDIT_KEY = process.env.XENDIT_API_BASE64
 const paymentConfig = {
   headers: {
     authorization: `Basic ${XENDIT_KEY}`,
@@ -14,16 +13,26 @@ const axios = require('axios')
 module.exports = {
   async checkout (req, res, next) {
     try {
-      const { email } = req.body
-
       const token = req.headers.access_token
       let userId = ''
       if (token) {
           const payload = verifyToken(token)
           userId = payload.id
       }
-  
 
+      const checkUser = await user.findOne({
+        where: { id: +userId }
+      })
+
+      if (checkUser.id != userId) {
+        return res.status(401).json({
+          success: false,
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
+        });
+      }
+  
       let amountOrder = await order.findOne({
         where: {
           id_user: +userId
@@ -48,12 +57,10 @@ module.exports = {
         ]
       })
 
-      console.log(amountOrder);
       let firstName = amountOrder.delivery.firstName
       let lastName = amountOrder.delivery.lastName
       let phone = amountOrder.delivery.phoneNumber
       let address = amountOrder.delivery.address
-      console.log(firstName, lastName, phone, address);
 
       /* FIND RECIPES IN CART */
       const cartData = await cart.findAll({
@@ -82,6 +89,7 @@ module.exports = {
       });
 
       const finalData = []
+      
       for(let i = 0 ; i < cartData.length ; i++) {
         const obj = {
           title : cartData[i].recipe.title,
@@ -98,32 +106,31 @@ module.exports = {
           finalData.push(obj)
         }
       }
-
-      /* Get all title recipe */
+       
+      /* Get all title recipe and amount */
       let allDescription = []
+      let finalAmount = []
       for(let i = 0; i < finalData.length; i++){
         allDescription.push(' ' + finalData[i].title + ' @ ' + finalData[i].quantity + 'pcs')
+        finalAmount.push(finalData[i].total)
       }
 
-      console.log('INI ALL DESCRIPTIN', allDescription[0]);
-      
+      let totalPrice = 0
+      for(let i = 0; i <finalAmount.length; i++){
+        totalPrice += finalAmount[i];
+      }
       
       /* YANG DIKIRIM KE XENDIT */
       const paymentPayload = {
         external_id: `Invoice-${amountOrder.dataValues.id}`,
-        amount: amountOrder.dataValues.total, // Dapet dari table order
-        payer_email: email,
+        amount: totalPrice,
         description: allDescription.toString(), // ISI DI CART
-        should_send_email: true,
+        should_send_email: false,
         merchant_profile_picture_url: "https://res.cloudinary.com/see-event/image/upload/v1638435431/c4qaz6prwl1zqg4un7ba.png",
         invoice_duration: 7200, // 2 hour
         customer: {
           given_names: `${firstName + ' ' + lastName}`,
-          email: email,
-          mobile_number: `${phone}`,
-          address: [
-            {address: 'Jln. Bersama Kamu No. 17, Tangerang'}
-          ]
+          mobile_number: `${phone}`
         },
       }
       

@@ -356,7 +356,7 @@ class Recipe {
           .json({ success: false, errors: ["Recipe not found"] });
       }
 
-      res.status(200).json({ success: true, data: data, allComments, averageRatings, allRatings });
+      res.status(200).json({ success: true, data: data, allComments, averageRatings, peopleRatings: allRatings.length, allRatings });
     } catch (error) {
       console.log(error);
       res
