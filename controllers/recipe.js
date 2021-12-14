@@ -279,6 +279,62 @@ class Recipe {
     }
   }
 
+  async myRecipe(req, res, next) {
+    try {
+      let { page = 1, limit = 6 } = req.query;
+      const userId = req.userData.id;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: ["You must have permission to delete it."],
+        });
+      }
+
+      const data = await recipe.findAll({
+        where: {
+          id_user: +userId
+        },
+        attributes: {
+          exclude: ["createdAt", "deletedAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: user,
+            attributes: ["userName"],
+          },
+          {
+            model: category,
+            attributes: ["name"],
+          },
+          {
+            model: type,
+            attributes: ["name"],
+          },
+          {
+            model: location,
+            attributes: ["name"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+        limit: +limit,
+        offset: (+page - 1) * parseInt(limit),
+      });
+
+      if (data == null) {
+        return res.status(404).json({ success: false, errors: ["Recipe not found"] });
+      }
+
+      res.status(200).json({ success: true, data: data });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
   async getDetailRecipe(req, res, next) {
     try {
       const userId = req.userData.id;

@@ -12,6 +12,7 @@ const {
     createRecipeFour,
     getAllRecipeFiltered,
     getAllRecipe,
+    myRecipe,
     getDetailRecipe,
     searchRecipe,
     updateRecipe,
@@ -26,6 +27,7 @@ router.put('/stepthree/:id', createRecipeThreeValidator, authentication, createR
 router.put('/stepfour/:id', createRecipeFourValidator, authentication, createRecipeFour);
 router.get('/filter', authentication, getAllRecipeFiltered);
 router.get('/search', authentication, searchRecipe);
+router.get('/myrecipe', authentication, myRecipe);
 router.get('/', authentication, getAllRecipe);
 router.get('/:id', authentication, getDetailRecipe);
 router.put('/:id', authentication, updateRecipe);
