@@ -1,8 +1,8 @@
 const { category, user, type, recipe, review, location, rating } = require("../models");
 const { Op } = require("sequelize");
 const { gte } = require("sequelize/dist/lib/operators");
-const Redis = require("ioredis")
-const redis = new Redis()
+// const Redis = require("ioredis")
+// const redis = new Redis()
 
 class Recipe {
   async createRecipeOne(req, res, next) {
@@ -243,10 +243,10 @@ class Recipe {
         });
       }
 
-      const cache = await redis.get(`getRecipe${page}${limit}`)
-      if (cache){
-        return res.status(200).json({ success: true, data: JSON.parse(cache) })
-      }
+      // const cache = await redis.get(`getRecipe${page}${limit}`)
+      // if (cache){
+      //   return res.status(200).json({ success: true, data: JSON.parse(cache) })
+      // }
 
       const data = await recipe.findAll({
         attributes: {
@@ -279,7 +279,7 @@ class Recipe {
         return res.status(404).json({ success: false, errors: ["Recipe not found"] });
       }
 
-      redis.set(`getRecipe${page}${limit}`, JSON.stringify(data))
+      // redis.set(`getRecipe${page}${limit}`, JSON.stringify(data))
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {
@@ -303,10 +303,10 @@ class Recipe {
         });
       }
 
-      const cache = await redis.get(`getRecipe${page}${limit}`)
-      if (cache){
-        return res.status(200).json({ success: true, data: JSON.parse(cache) })
-      }
+      // const cache = await redis.get(`getRecipe${page}${limit}`)
+      // if (cache){
+      //   return res.status(200).json({ success: true, data: JSON.parse(cache) })
+      // }
 
       const data = await recipe.findAll({
         where: {
@@ -342,7 +342,7 @@ class Recipe {
         return res.status(404).json({ success: false, errors: ["Recipe not found"] });
       }
 
-      redis.set(`getRecipe${page}${limit}`, JSON.stringify(data))
+      // redis.set(`getRecipe${page}${limit}`, JSON.stringify(data))
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {

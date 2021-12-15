@@ -1,6 +1,6 @@
 const { user, cart, recipe } = require("../models");
-const Redis = require("ioredis")
-const redis = new Redis()
+// const Redis = require("ioredis")
+// const redis = new Redis()
 
 class Cart {
   async showCart(req, res, next) {
@@ -17,11 +17,11 @@ class Cart {
         });
       }
 
-      const cacheShowCart = await redis.get(`showcart`)
-      const cacheDataCart = await redis.get(`data`)
-      if (cacheShowCart && cacheDataCart){
-        return res.status(200).json({ success: true, total: JSON.parse(cacheDataCart).length, data: JSON.parse(cacheShowCart) })
-      }
+      // const cacheShowCart = await redis.get(`showcart`)
+      // const cacheDataCart = await redis.get(`data`)
+      // if (cacheShowCart && cacheDataCart){
+      //   return res.status(200).json({ success: true, total: JSON.parse(cacheDataCart).length, data: JSON.parse(cacheShowCart) })
+      // }
 
       const data = await cart.findAll({
         where: { id_user: +userId },
@@ -74,8 +74,8 @@ class Cart {
           .json({ success: false, errors: ["Cart is Empty"] });
       }
 
-      redis.set(`dataCart`, JSON.stringify(data))
-      redis.set(`showCart`, JSON.stringify(finalData))
+      // redis.set(`dataCart`, JSON.stringify(data))
+      // redis.set(`showCart`, JSON.stringify(finalData))
 
       res.status(200).json({ success: true, total: data.length, data: finalData });
     } catch (error) {

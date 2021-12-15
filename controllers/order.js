@@ -9,8 +9,8 @@ const {
   delivery,
   location,
 } = require("../models");
-const Redis = require("ioredis")
-const redis = new Redis()
+// const Redis = require("ioredis")
+// const redis = new Redis()
 
 class Order {
   async createPayment(req, res, next) {
@@ -64,21 +64,12 @@ class Order {
         });
       }
 
-      const cacheDetailDelivery = await redis.get(`detailDelivery`)
-      const cacheDetailOrder = await redis.get(`detailOrder`)
-      const cacheOrderCart = await redis.get(`orderCart`)
-      if (cacheDetailDelivery && cacheDetailOrder && cacheOrderCart){
-        return res.status(200).json({ success: true, detailDelivery: JSON.parse(cacheDetailDelivery), detailOrder: JSON.parse(cacheDetailOrder), cart: JSON.parse(cacheOrderCart) })
-      }
-
-      // success: true,
-      // detailDelivery: detailDelivery,
-      // detailOrder: getOrder,
-      // cart: finalData,
-
-      // redis.set(`detailDelivery`, JSON.stringify(detailDelivery))
-      // redis.set(`detailOrder`, JSON.stringify(getOrder))
-      // redis.set(`orderCart`, JSON.stringify(finalData))
+      // const cacheDetailDelivery = await redis.get(`detailDelivery`)
+      // const cacheDetailOrder = await redis.get(`detailOrder`)
+      // const cacheOrderCart = await redis.get(`orderCart`)
+      // if (cacheDetailDelivery && cacheDetailOrder && cacheOrderCart){
+      //   return res.status(200).json({ success: true, detailDelivery: JSON.parse(cacheDetailDelivery), detailOrder: JSON.parse(cacheDetailOrder), cart: JSON.parse(cacheOrderCart) })
+      // }
 
       /* DETAIL USER DELIVERY */
       const userFirstName = checkUser.dataValues.firstName;
@@ -237,9 +228,9 @@ class Order {
         limit: 1
       });
 
-      redis.set(`detailDelivery`, JSON.stringify(detailDelivery))
-      redis.set(`detailOrder`, JSON.stringify(getOrder))
-      redis.set(`orderCart`, JSON.stringify(finalData))
+      // redis.set(`detailDelivery`, JSON.stringify(detailDelivery))
+      // redis.set(`detailOrder`, JSON.stringify(getOrder))
+      // redis.set(`orderCart`, JSON.stringify(finalData))
 
       res.status(200).json({
         success: true,
