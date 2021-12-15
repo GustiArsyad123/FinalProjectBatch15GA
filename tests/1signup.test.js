@@ -6,14 +6,6 @@ const app = require("../index");
 
 const { encodePin } = require("../utils");
 
-// beforeAll(async () => {
-//   let users = await user.create({
-//     email: "selamat@gmail.com",
-//     userName: "Gusti123",
-//     password: "12345TestingOke!",
-//     confirmPassword: "12345TestingOke!",
-//   });
-// });
 afterAll((done) => {
   user
     .destroy({ where: {}, force: true })

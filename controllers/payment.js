@@ -1,5 +1,8 @@
 const { verifyToken } = require("../utils/index");
 const { order, cart, user, recipe, delivery } = require('../models')
+const nodemailer = require("nodemailer");
+const hbs = require("nodemailer-express-handlebars");
+const path = require("path");
 
 const XENDIT_URL = process.env.XENDIT_INVOICE
 const XENDIT_KEY = process.env.XENDIT_API_BASE64
@@ -114,6 +117,7 @@ module.exports = {
         finalAmount.push(finalData[i].total)
       }
 
+      /* Count all price */
       let totalPrice = 0
       for(let i = 0; i <finalAmount.length; i++){
         totalPrice += finalAmount[i];
@@ -123,6 +127,7 @@ module.exports = {
       const paymentPayload = {
         external_id: `Invoice-${amountOrder.dataValues.id}`,
         amount: totalPrice,
+        payer_email: `${userId}@chefbox.com`, // Get ID User
         description: allDescription.toString(),
         should_send_email: false,
         merchant_profile_picture_url: "https://res.cloudinary.com/see-event/image/upload/v1638435431/c4qaz6prwl1zqg4un7ba.png",
@@ -149,12 +154,93 @@ module.exports = {
   async callbackURL (req, res, next) {
     try {
       console.log(req.body)
+      const email = req.body.payer_email
+      const idArray = email.split('@')
+      const id = idArray[0]
+      
+      if(Number.isInteger(+id) && req.body.status == 'PAID'){
+        await order.update({
+          ispayment: true
+        },{
+          where: {
+            id_user: +id
+          }, 
+        })
 
-      // await order.update(req.body.status,{
-      //   where: {
-      //     id_user
-      //   }, 
-      // })
+        const getOrder = await cart.findAll({
+          where: {
+            id_user: +id
+          },
+          include: [
+            {
+              model: recipe,
+              include: [
+                {
+                  model: user,
+                  attributes: ["email"],
+                },
+              ]
+            },
+          ]
+        })
+        
+        let emailSeller = []
+        for(let i = 1; i < getOrder.length; i++){
+          emailSeller.push(getOrder[i].recipe.user.email)
+        }
+
+        const removeDuplicateEmail = [...new Set(emailSeller)];
+        console.log("INI EMAIL SELLER NO DUPLICATE", removeDuplicateEmail);
+
+        /* Function to send complete payment email to seller */
+        var transporter = nodemailer.createTransport({
+          service: "Gmail",
+          auth: {
+            user: "chefbox2021@gmail.com",
+            pass: "Bantenku1",
+          },
+        });
+
+        transporter.use(
+          "compile",
+            hbs({
+              viewEngine: {
+                extname: ".hbs", // handlebars extension
+                partialsDir: "./templates/",
+                layoutsDir: "./templates/",
+                defaultLayout: "successPayment",
+            },
+              viewPath: "./templates/",
+              extName: ".hbs",
+          })
+        );
+
+        transporter.verify(function (error, success) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Server is ready to take our messages");
+            console.log(success);
+          }
+        });
+
+        for(let i = 0; i < removeDuplicateEmail.length; i++){
+          let mailOptions = {
+            from: "chefbox2021@gmail.com",
+            to: removeDuplicateEmail[i],
+            subject: "Message",
+            template: "successPayment",
+            context: {
+              userName: 'Seller ChefBox',
+            },
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {});
+        }
+      }
+
+      
+
       /**
       * callback payload from xendit/invoice service 
       {
