@@ -1,6 +1,8 @@
 const { category, user, type, recipe, review, location, rating } = require("../models");
 const { Op } = require("sequelize");
 const { gte } = require("sequelize/dist/lib/operators");
+const Redis = require("ioredis")
+const redis = new Redis()
 
 class Recipe {
   async createRecipeOne(req, res, next) {
@@ -241,6 +243,11 @@ class Recipe {
         });
       }
 
+      const cache = await redis.get(`getRecipe${page}${limit}`)
+      if (cache){
+        return res.status(200).json({ success: true, data: JSON.parse(cache) })
+      }
+
       const data = await recipe.findAll({
         attributes: {
           exclude: ["createdAt", "deletedAt", "updatedAt"],
@@ -272,6 +279,8 @@ class Recipe {
         return res.status(404).json({ success: false, errors: ["Recipe not found"] });
       }
 
+      redis.set(`getRecipe${page}${limit}`, JSON.stringify(data))
+
       res.status(200).json({ success: true, data: data });
     } catch (error) {
       console.log(error);
@@ -292,6 +301,11 @@ class Recipe {
           success: false,
           errors: ["You must have permission to delete it."],
         });
+      }
+
+      const cache = await redis.get(`getRecipe${page}${limit}`)
+      if (cache){
+        return res.status(200).json({ success: true, data: JSON.parse(cache) })
       }
 
       const data = await recipe.findAll({
@@ -327,6 +341,8 @@ class Recipe {
       if (data == null) {
         return res.status(404).json({ success: false, errors: ["Recipe not found"] });
       }
+
+      redis.set(`getRecipe${page}${limit}`, JSON.stringify(data))
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {

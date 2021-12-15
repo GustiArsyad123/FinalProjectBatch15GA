@@ -36,7 +36,6 @@ app.use(express.static("public"));
 //     secret: "SECRET",
 //   })
 // );
-
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEYCLOUD,
