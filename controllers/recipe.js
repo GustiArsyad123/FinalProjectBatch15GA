@@ -2,7 +2,11 @@ const { category, user, type, recipe, review, location, rating } = require("../m
 const { Op } = require("sequelize");
 const { gte } = require("sequelize/dist/lib/operators");
 // const Redis = require("ioredis")
-// const redis = new Redis()
+// const redis = new Redis(process.env.REDIS_URL, {
+//   tls: {
+//       rejectUnauthorized: false
+//   }
+// });
 
 class Recipe {
   async createRecipeOne(req, res, next) {
