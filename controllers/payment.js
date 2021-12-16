@@ -183,6 +183,38 @@ module.exports = {
             },
           ]
         })
+
+        const finalData = []
+      
+        for(let i = 0 ; i < getOrder.length ; i++) {
+          const obj = {
+            id: getOrder[i].recipe.id,
+            title : getOrder[i].recipe.title,
+            price : getOrder[i].recipe.price,
+            image: getOrder[i].recipe.image,
+            quantity: 1,
+            total : getOrder[i].recipe.price,
+            stock: getOrder[i].recipe.stock
+          }
+          const idx = finalData.findIndex(el => el.title === getOrder[i].recipe.title )
+          if(idx >= 0 ) {
+            finalData[idx].quantity++
+            finalData[idx].total = finalData[idx].quantity * finalData[idx].price
+          }else {
+            finalData.push(obj)
+          }
+        }
+
+        for(let i = 0; i < finalData.length; i++){
+          await recipe.update({
+            stock: finalData[i].stock - finalData[i].quantity
+          },
+          {
+            where: {
+              id: finalData[i].id
+            }
+          })
+        }
         
         let emailSeller = []
         for(let i = 1; i < getOrder.length; i++){
@@ -236,6 +268,24 @@ module.exports = {
         };
 
         transporter.sendMail(mailOptions, (err, info) => {});
+
+        let idOfRecipe = []
+        for(let i = 1; i < getOrder.length; i++){
+          idOfRecipe.push(getOrder[i].recipe.id)
+        }
+
+        const removeDuplicateID = [...new Set(idOfRecipe)];
+        console.log("INI ID RECIPE NO DUPLICATE", removeDuplicateID);
+
+        for(let i = 0; i < removeDuplicateID.length; i++){
+          await cart.destroy({
+            where: {
+              id_user: +id,
+              id_recipe: removeDuplicateID[i]
+            },
+            force: true
+          })
+        }
         }
       }
 

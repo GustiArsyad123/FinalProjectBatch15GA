@@ -11,11 +11,15 @@ const {
 } = require("../models");
 // const Redis = require("ioredis")
 // const fs = require("fs");
-// // const redis = new Redis(process.env.REDIS_URL, {
-// //   tls: {
-// //       rejectUnauthorized: false
-// //   }
-// // });
+// const redis = new Redis(process.env.REDIS_URL, {
+//   tls: {
+//       rejectUnauthorized: false
+//   }
+// });
+
+// const client = require('redis').createClient({
+//   url: process.env.REDIS_URL
+// })
 
 // redis.on('connect', function () { console.log('REDIS NYAMBUNG'); });
 // console.log(redis.status)
@@ -464,6 +468,39 @@ class Order {
         .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
+
+  // async dashboardSeller(req, res, next) {
+  //   try {
+  //     const userId = req.userData.id;
+  //     const { idDelivery } = req.params
+  //     const checkUser = await user.findOne({
+  //       where: { id: +userId },
+  //     });
+
+  //     if (checkUser.id != userId) {
+  //       return res.status(401).json({
+  //         success: false,
+  //         errors: [
+  //           "You must signin first, because you don't have permission to access.",
+  //         ],
+  //       });
+  //     }
+
+  //     const getOrder = await order.findAll({
+  //       where: { id: +userId },
+  //     });
+
+  //     res.status(201).json({
+  //       success: true,
+  //       message: ["Success edit delivery address"]
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     res
+  //       .status(500)
+  //       .json({ success: false, errors: ["Internal Server Error"] });
+  //   }
+  // }
 }
 
 module.exports = new Order();

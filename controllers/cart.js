@@ -5,6 +5,9 @@ const { user, cart, recipe } = require("../models");
 //       rejectUnauthorized: false
 //   }
 // });
+// const client = require('redis').createClient({
+//   url: process.env.REDIS_URL
+// })
 
 class Cart {
   async showCart(req, res, next) {
@@ -21,8 +24,8 @@ class Cart {
         });
       }
 
-      // const cacheShowCart = await redis.get(`showcart`)
-      // const cacheDataCart = await redis.get(`data`)
+      // const cacheShowCart = await client.get(`showcart`)
+      // const cacheDataCart = await client.get(`data`)
       // if (cacheShowCart && cacheDataCart){
       //   return res.status(200).json({ success: true, total: JSON.parse(cacheDataCart).length, data: JSON.parse(cacheShowCart) })
       // }
@@ -78,8 +81,8 @@ class Cart {
           .json({ success: false, errors: ["Cart is Empty"] });
       }
 
-      // redis.set(`dataCart`, JSON.stringify(data))
-      // redis.set(`showCart`, JSON.stringify(finalData))
+      // client.set(`dataCart`, JSON.stringify(data))
+      // client.set(`showCart`, JSON.stringify(finalData))
 
       res.status(200).json({ success: true, total: data.length, data: finalData });
     } catch (error) {
@@ -106,6 +109,15 @@ class Cart {
         });
       }
 
+      const checkStock = await recipe.findOne({
+        where: {
+          id: idRecipe
+        }
+      })
+
+      const recipeStock = checkStock.dataValues.stock
+      console.log(recipeStock);
+
       const getPreviousCart = await cart.findAll({
         where: {
           id_user: +userId,
@@ -119,8 +131,14 @@ class Cart {
           id_user: +userId,
           id_recipe: +idRecipe
         });
-        total.push(addToCart)
+        if(quantity <= recipeStock){
+          total.push(addToCart)
+        } else {
+          return res.status(400).json({ success: false, message: 'Stock tidak cukup dengan quantity yang diminta'})
+        }
+
       }
+
       const semuaCart = getPreviousCart.length + total.length 
 
       const quantityCart = await cart.findAll({
