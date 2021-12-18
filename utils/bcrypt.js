@@ -4,7 +4,7 @@ const encodePin = (plain) => {
   try {
     return bcrypt.hashSync(plain, 10);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
@@ -16,3 +16,4 @@ module.exports = {
   encodePin,
   compare,
 };
+// add
