@@ -27,10 +27,10 @@ class Order {
         });
       }
 
-      const data = await order.update(req.body,{
+      const data = await order.update(req.body, {
         where: {
-          id_user: +userId
-        }
+          id_user: +userId,
+        },
       });
 
       res
@@ -86,19 +86,21 @@ class Order {
         });
       } else {
         /* IF FOUND, UPDATE USER DELIVERY */
-        await delivery.update({
-          firstName: getDelivery.dataValues.firstName,
-          lastName: getDelivery.dataValues.lastName,
-          address: getDelivery.dataValues.address,
-          phoneNumber: getDelivery.dataValues.phoneNumber,
-        },
-        {
-          where: {
-            usernya: +userId,
-        },
-      });
+        await delivery.update(
+          {
+            firstName: getDelivery.dataValues.firstName,
+            lastName: getDelivery.dataValues.lastName,
+            address: getDelivery.dataValues.address,
+            phoneNumber: getDelivery.dataValues.phoneNumber,
+          },
+          {
+            where: {
+              usernya: +userId,
+            },
+          }
+        );
       }
-      
+
       /* GET FINAL DATA DELIVERY */
       const detailDelivery = await delivery.findOne({
         where: {
@@ -107,8 +109,8 @@ class Order {
         attributes: {
           exclude: ["usernya", "createdAt", "deletedAt", "updatedAt"],
         },
-        order: [['id', 'DESC']],
-        limit: 1
+        order: [["id", "DESC"]],
+        limit: 1,
       });
 
       /* FIND ALL DATA IN CART */
@@ -137,46 +139,48 @@ class Order {
           {
             model: recipe,
             attributes: ["stock"],
-          }
+          },
         ],
       });
 
       /* FILTER DUPLICATE RECIPES IN CART */
-      const finalData = []
-      for(let i = 0 ; i < cartData.length ; i++) {
+      const finalData = [];
+      for (let i = 0; i < cartData.length; i++) {
         const obj = {
-          title : cartData[i].recipe.title,
-          price : cartData[i].recipe.price,
+          title: cartData[i].recipe.title,
+          price: cartData[i].recipe.price,
           image: cartData[i].recipe.image,
           quantity: 1,
-          total : cartData[i].recipe.price
-        }
-        const idx = finalData.findIndex(el => el.title === cartData[i].recipe.title )
-        if(idx >= 0 ) {
-          finalData[idx].quantity++
-          finalData[idx].total = finalData[idx].quantity * finalData[idx].price
-        }else {
-          finalData.push(obj)
+          total: cartData[i].recipe.price,
+        };
+        const idx = finalData.findIndex(
+          (el) => el.title === cartData[i].recipe.title
+        );
+        if (idx >= 0) {
+          finalData[idx].quantity++;
+          finalData[idx].total = finalData[idx].quantity * finalData[idx].price;
+        } else {
+          finalData.push(obj);
         }
       }
 
       /* GET ALL PRICES IN CART */
-      let allPrice = []
-      for(let i = 0; i < finalData.length; i++){
-        allPrice.push(finalData[i].total)
+      let allPrice = [];
+      for (let i = 0; i < finalData.length; i++) {
+        allPrice.push(finalData[i].total);
       }
 
       /* COUNT ALL PRICES IN CART */
-      let totalPrice = 0
-      for(let i = 0; i <allPrice.length; i++){
+      let totalPrice = 0;
+      for (let i = 0; i < allPrice.length; i++) {
         totalPrice += allPrice[i];
       }
 
       /* FIND OR CREATE ORDER*/
       const findOrder = await order.findOne({
         where: {
-          id_user: +userId
-        }
+          id_user: +userId,
+        },
       });
 
       /* IF NOT FOUND, CREATE */
@@ -188,35 +192,44 @@ class Order {
           subtotal: totalPrice,
           deliveryFee: 15000,
           total: totalPrice + 15000,
-          ispayment: false
-        })
+          ispayment: false,
+        });
       } else {
         /* IF FOUND, UPDATE WITH THE NEW DATA IN DATABASE */
-        await order.update({
-          id_user: +userId,
-          id_delivery: detailDelivery.dataValues.id,
-          quantity: cartData.length,
-          subtotal: totalPrice,
-          deliveryFee: 15000,
-          total: totalPrice + 15000,
-        },
-        {
-          where: {
-            id_user: +userId
+        await order.update(
+          {
+            id_user: +userId,
+            id_delivery: detailDelivery.dataValues.id,
+            quantity: cartData.length,
+            subtotal: totalPrice,
+            deliveryFee: 15000,
+            total: totalPrice + 15000,
+          },
+          {
+            where: {
+              id_user: +userId,
+            },
           }
-        })
-      };
+        );
+      }
 
       /* GET FINAL DATA ORDER */
       const getOrder = await order.findOne({
         where: {
-          id_user: +userId
+          id_user: +userId,
         },
         attributes: {
-          exclude: ["id_recipe", "id_category", "id_type", "createdAt", "updatedAt", "deletedAt"]
+          exclude: [
+            "id_recipe",
+            "id_category",
+            "id_type",
+            "createdAt",
+            "updatedAt",
+            "deletedAt",
+          ],
         },
-        order: [['id', 'DESC']],
-        limit: 1
+        order: [["id", "DESC"]],
+        limit: 1,
       });
 
       res.status(200).json({
@@ -227,14 +240,16 @@ class Order {
       });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
   async editAddressDelivery(req, res, next) {
     try {
       const userId = req.userData.id;
-      const { idDelivery } = req.params
+      const { idDelivery } = req.params;
       const checkUser = await user.findOne({
         where: { id: +userId },
       });
@@ -254,7 +269,7 @@ class Order {
 
       res.status(201).json({
         success: true,
-        message: ["Success edit delivery address"]
+        message: ["Success edit delivery address"],
       });
     } catch (error) {
       console.log(error);
@@ -281,8 +296,8 @@ class Order {
       }
 
       /* INI BUAT NYARI ISI DI CART */
-      let arrayResepDiCart = []
-      let arrayStock = []
+      let arrayResepDiCart = [];
+      let arrayStock = [];
       let resepDiCart = await cart.findAll({
         where: { id_user: +userId },
         include: [
@@ -293,8 +308,8 @@ class Order {
           {
             model: recipe,
             attributes: ["stock"],
-          }
-        ]
+          },
+        ],
       });
 
       for (let i = 0; i < resepDiCart.length; i++) {
@@ -314,33 +329,36 @@ class Order {
       let resep = null;
       let cnt = 0;
 
-      let amount = []
-        for (var i = 0; i < titleAndAmount.length; i++) {
-          if (titleAndAmount[i] != resep) {
-            if (cnt > 0) {
-              amount.push(cnt)
-            }
-            resep = titleAndAmount[i];
-            cnt = 1;
-          } else {
-            cnt++;
+      let amount = [];
+      for (var i = 0; i < titleAndAmount.length; i++) {
+        if (titleAndAmount[i] != resep) {
+          if (cnt > 0) {
+            amount.push(cnt);
           }
+          resep = titleAndAmount[i];
+          cnt = 1;
+        } else {
+          cnt++;
         }
-        if (cnt > 0) {
-          amount.push(cnt)
       }
-    
+      if (cnt > 0) {
+        amount.push(cnt);
+      }
+
       /* INI BUAT NYARI QUANTITY PER RESEP DI CART */
-      for (let i = 0; i < arrayResepDiCart.length - 1; i++){
+      for (let i = 0; i < arrayResepDiCart.length - 1; i++) {
         for (let j = 0; j < arrayStock.length; j++) {
           for (let k = 0; k < amount.length; k++) {
-            await recipe.update({
-              stock: parseInt(arrayStock[i]) - parseInt(amount[i])
-            },{
-              where: {
-                title: arrayResepDiCart[i]
+            await recipe.update(
+              {
+                stock: parseInt(arrayStock[i]) - parseInt(amount[i]),
+              },
+              {
+                where: {
+                  title: arrayResepDiCart[i],
+                },
               }
-            })
+            );
           }
         }
       }
@@ -378,18 +396,17 @@ class Order {
       });
 
       let mailOptions = {
-        from: 'chefbox2021@gmail.com',
+        from: "chefbox2021@gmail.com",
         to: data.dataValues.email,
-        subject: 'Message',
-        template: 'invoice',
+        subject: "Message",
+        template: "invoice",
         context: {
           email: data.dataValues.email,
           userName: data.dataValues.userName,
-        }
-      }
+        },
+      };
 
-      transporter.sendMail(mailOptions, (err, info) => {
-      });
+      transporter.sendMail(mailOptions, (err, info) => {});
 
       /* Empty cart and delivery table after confirmed */
       const emptyDelivery = await delivery.destroy({
@@ -399,18 +416,27 @@ class Order {
         where: { id_user: +userId },
       });
 
-      if(!emptyCart){
-        return res.status(404).json({ status: false, errors: ["Cart is empty"]})
+      if (!emptyCart) {
+        return res
+          .status(404)
+          .json({ status: false, errors: ["Cart is empty"] });
       }
 
-      res.status(201).json({ success: true, message: ["Success submit your receipt payment, please wait seller to process your request"]});
+      res
+        .status(201)
+        .json({
+          success: true,
+          message: [
+            "Success submit your receipt payment, please wait seller to process your request",
+          ],
+        });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
-
-
 
   async updateReceipt(req, res, next) {
     try {
