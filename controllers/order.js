@@ -532,9 +532,10 @@ class Order {
             finalData.push(obj)
         }
       }
-        console.log("INI FINAL DATA", finalData);
+      console.log("INI FINAL DATA", finalData);
 
       const data = [...new Set(dashSeller)];
+      console.log("ini data", data);
       res.status(200).json({
         success: true,
         data: finalData

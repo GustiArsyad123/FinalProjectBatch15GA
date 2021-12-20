@@ -20,7 +20,7 @@ class Rating {
         });
       }
 
-      const newData = await rating.create({
+      await rating.create({
         value: value,
         id_user: +userId,
         id_recipe: +idRecipe
@@ -37,8 +37,8 @@ class Rating {
   async getRating(req, res, next) {
     try {
 
-    const userId = req.userData.id;
-    const { idRecipe } = req.params
+      const userId = req.userData.id;
+      const { idRecipe } = req.params
       const checkUser = await user.findOne({
         where: { id: userId },
       });
@@ -52,7 +52,7 @@ class Rating {
         });
       }
 
-      const data = await rating.findOne({
+      const data = await rating.findAll({
         where: {
           id_user: +userId,
           id_recipe: +idRecipe

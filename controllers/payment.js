@@ -332,15 +332,15 @@ module.exports = {
           })
         }
 
-        // for(let i = 0; i < removeDuplicateID.length; i++){
-        //   await cart.destroy({
-        //     where: {
-        //       id_user: +id,
-        //       id_recipe: removeDuplicateID[i]
-        //     },
-        //     force: true
-        //   })
-        // }
+        for(let i = 0; i < removeDuplicateID.length; i++){
+          await cart.destroy({
+            where: {
+              id_user: +id,
+              id_recipe: removeDuplicateID[i]
+            },
+            force: true
+          })
+        }
         }
       }
 
