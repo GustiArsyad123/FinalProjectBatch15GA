@@ -1,13 +1,4 @@
 const { user, cart, recipe } = require("../models");
-// const Redis = require("ioredis")
-// const redis = new Redis(process.env.REDIS_URL, {
-//   tls: {
-//       rejectUnauthorized: false
-//   }
-// });
-// const client = require('redis').createClient({
-//   url: process.env.REDIS_URL
-// })
 
 class Cart {
   async showCart(req, res, next) {
@@ -23,12 +14,6 @@ class Cart {
           errors: ["You must have permission to Add it."],
         });
       }
-
-      // const cacheShowCart = await client.get(`showcart`)
-      // const cacheDataCart = await client.get(`data`)
-      // if (cacheShowCart && cacheDataCart){
-      //   return res.status(200).json({ success: true, total: JSON.parse(cacheDataCart).length, data: JSON.parse(cacheShowCart) })
-      // }
 
       const data = await cart.findAll({
         where: { id_user: +userId },
@@ -80,9 +65,6 @@ class Cart {
           .status(404)
           .json({ success: false, errors: ["Cart is Empty"] });
       }
-
-      // client.set(`dataCart`, JSON.stringify(data))
-      // client.set(`showCart`, JSON.stringify(finalData))
 
       res.status(200).json({ success: true, total: data.length, data: finalData });
     } catch (error) {

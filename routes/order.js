@@ -8,6 +8,7 @@ const {
   editAddressDelivery,
   confirmPayment,
   updateReceipt,
+  dashboardSeller
 } = require("../controllers/order");
 
 const { checkout, callbackURL } = require("../controllers/payment");
@@ -15,6 +16,7 @@ const { checkout, callbackURL } = require("../controllers/payment");
 const router = express.Router();
 
 router.get("/", authentication, getCheckout);
+router.get("/seller", authentication, dashboardSeller);
 router.post("/", uploadReceiptValidator, authentication, createPayment);
 router.patch("/:idDelivery", authentication, editAddressDelivery);
 router.get("/confirmpayment", authentication, confirmPayment);

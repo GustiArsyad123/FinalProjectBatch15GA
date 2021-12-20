@@ -1,5 +1,5 @@
 const { verifyToken } = require("../utils/index");
-const { order, cart, user, recipe, delivery } = require('../models')
+const { order, cart, user, recipe, delivery, seller } = require('../models')
 const nodemailer = require("nodemailer");
 const hbs = require("nodemailer-express-handlebars");
 const path = require("path");
@@ -167,6 +167,14 @@ module.exports = {
           }, 
         })
 
+        await delivery.update({
+          ispayment: true
+        },{
+          where: {
+            usernya: +id
+          }, 
+        })
+
         const getOrder = await cart.findAll({
           where: {
             id_user: +id
@@ -178,6 +186,10 @@ module.exports = {
                 {
                   model: user,
                   attributes: ["email"],
+                },
+                {
+                  model: user,
+                  attributes: ["id"],
                 },
               ]
             },
@@ -194,7 +206,8 @@ module.exports = {
             image: getOrder[i].recipe.image,
             quantity: 1,
             total : getOrder[i].recipe.price,
-            stock: getOrder[i].recipe.stock
+            stock: getOrder[i].recipe.stock,
+            sellerID: getOrder[i].recipe.user.id
           }
           const idx = finalData.findIndex(el => el.title === getOrder[i].recipe.title )
           if(idx >= 0 ) {
@@ -204,6 +217,7 @@ module.exports = {
             finalData.push(obj)
           }
         }
+        console.log("INI FINAL DATA", finalData);
 
         for(let i = 0; i < finalData.length; i++){
           await recipe.update({
@@ -277,43 +291,59 @@ module.exports = {
         const removeDuplicateID = [...new Set(idOfRecipe)];
         console.log("INI ID RECIPE NO DUPLICATE", removeDuplicateID);
 
-        for(let i = 0; i < removeDuplicateID.length; i++){
-          await cart.destroy({
-            where: {
-              id_user: +id,
-              id_recipe: removeDuplicateID[i]
+        let detailOrder = await order.findAll({
+          where: {
+            id_user: +id
+          },
+          include: [
+            {
+              model: delivery,
+              attributes: ["firstName"],
             },
-            force: true
+            {
+              model: delivery,
+              attributes: ["lastName"],
+            },
+            {
+              model: delivery,
+              attributes: ["address"],
+            },
+            {
+              model: delivery,
+              attributes: ["phoneNumber"],
+            },
+          ],
+          order: [['id', 'DESC']],
+          limit: 1
+        })
+
+        console.log("INI detailOrder", detailOrder.dataValues);
+
+        for(let i = 0; i < finalData.length; i++){
+          await seller.create({
+            id_order: detailOrder[0].id,
+            id_user: +id,
+            id_recipe: finalData[i].id,
+            quantity: finalData[i].quantity,
+            sellerID: finalData[i].sellerID,
+            delivery_name: detailOrder[0].dataValues.delivery.dataValues.firstName + ' ' + detailOrder[0].dataValues.delivery.dataValues.lastName,
+            delivery_address: detailOrder[0].dataValues.delivery.dataValues.address,
+            delivery_phonenumber: detailOrder[0].dataValues.delivery.dataValues.phoneNumber
           })
         }
+
+        // for(let i = 0; i < removeDuplicateID.length; i++){
+        //   await cart.destroy({
+        //     where: {
+        //       id_user: +id,
+        //       id_recipe: removeDuplicateID[i]
+        //     },
+        //     force: true
+        //   })
+        // }
         }
       }
 
-      
-
-      /**
-      * callback payload from xendit/invoice service 
-      {
-        id: '61b89f4e25df117ddd2004f5',     
-        user_id: '61a973c07ab41702fd944898',
-        external_id: 'Invoice-5',
-        is_high: false,
-        status: 'PAID',
-        merchant_name: 'ChefBox',
-        amount: 1756000,
-        created: '2021-12-14T13:42:39.358Z',
-        updated: '2021-12-14T13:55:27.904Z',
-        description: ' Nasi Goreng Pedas @ 6pcs, Spaghetti Bolognesse @ 28pcs',
-        paid_amount: 1756000,
-        fees_paid_amount: 5500,
-        payment_method: 'RETAIL_OUTLET',
-        adjusted_received_amount: 1750500,
-        currency: 'IDR',
-        paid_at: '2021-12-14T13:55:27.7Z',
-        payment_channel: 'INDOMARET',
-        payment_destination: 'TEST262013'
-      }
-      */
       res.status(200).json({message: req.body})
     }
     catch(err) {

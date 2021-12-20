@@ -8,21 +8,8 @@ const {
   cart,
   delivery,
   location,
+  seller
 } = require("../models");
-// const Redis = require("ioredis")
-// const fs = require("fs");
-// const redis = new Redis(process.env.REDIS_URL, {
-//   tls: {
-//       rejectUnauthorized: false
-//   }
-// });
-
-// const client = require('redis').createClient({
-//   url: process.env.REDIS_URL
-// })
-
-// redis.on('connect', function () { console.log('REDIS NYAMBUNG'); });
-// console.log(redis.status)
 
 class Order {
   async createPayment(req, res, next) {
@@ -76,14 +63,6 @@ class Order {
         });
       }
 
-      // const cacheDetailDelivery = await redis.get(`detailDelivery`)
-      // const cacheDetailOrder = await redis.get(`detailOrder`)
-      // const cacheOrderCart = await redis.get(`orderCart`)
-      // console.log("INI STRINGIFY", cacheDetailDelivery);
-      // if (cacheDetailDelivery && cacheDetailOrder && cacheOrderCart){
-      //   return res.status(200).json({ success: true, detailDelivery: JSON.parse(cacheDetailDelivery), detailOrder: JSON.parse(cacheDetailOrder), cart: JSON.parse(cacheOrderCart) })
-      // }
-
       /* DETAIL USER DELIVERY */
       const userFirstName = checkUser.dataValues.firstName;
       const userLastName = checkUser.dataValues.lastName;
@@ -91,28 +70,31 @@ class Order {
       const userPhoneNumber = checkUser.dataValues.phoneNumber;
 
       /* FIND OR CREATE DELIVERY */
-      const getDelivery = await delivery.findOne({
+      const getDelivery = await delivery.findAll({
         where: {
           usernya: +userId,
         },
+        order: [["id", "desc"]],
+        limit: 1
       });
 
       /* CREATE DETAIL DELIVERY IF NOT FOUND */
-      if (getDelivery == undefined || null) {
+      if (getDelivery == null || getDelivery.length == 0 || getDelivery[0].ispayment == true) {
         await delivery.create({
           usernya: +userId,
           firstName: userFirstName,
           lastName: userLastName,
           address: userAddress,
           phoneNumber: userPhoneNumber,
+          ispayment: false
         });
       } else {
         /* IF FOUND, UPDATE USER DELIVERY */
         await delivery.update({
-          firstName: getDelivery.dataValues.firstName,
-          lastName: getDelivery.dataValues.lastName,
-          address: getDelivery.dataValues.address,
-          phoneNumber: getDelivery.dataValues.phoneNumber,
+          firstName: getDelivery.firstName,
+          lastName: getDelivery.lastName,
+          address: getDelivery.address,
+          phoneNumber: getDelivery.phoneNumber,
         },
         {
           where: {
@@ -122,7 +104,7 @@ class Order {
       }
       
       /* GET FINAL DATA DELIVERY */
-      const detailDelivery = await delivery.findOne({
+      const detailDelivery = await delivery.findAll({
         where: {
           usernya: +userId,
         },
@@ -132,6 +114,8 @@ class Order {
         order: [['id', 'DESC']],
         limit: 1
       });
+
+      console.log("Detail Delivery", detailDelivery);
 
       /* FIND ALL DATA IN CART */
       const cartData = await cart.findAll({
@@ -195,17 +179,39 @@ class Order {
       }
 
       /* FIND OR CREATE ORDER*/
-      const findOrder = await order.findOne({
+      const findOrder = await order.findAll({
         where: {
           id_user: +userId
-        }
+        },
+        include: [
+          {
+            model: delivery,
+            attributes: ["firstName"],
+          },
+          {
+            model: delivery,
+            attributes: ["lastName"],
+          },
+          {
+            model: delivery,
+            attributes: ["address"],
+          },
+          {
+            model: delivery,
+            attributes: ["phoneNumber"],
+          },
+        ],
+        order: [['id', 'desc']],
+        limit: 1
       });
 
+      console.log('INI FIND ORDER', findOrder);
+
       /* IF NOT FOUND, CREATE */
-      if (!findOrder) {
+      if (findOrder == null || findOrder.length == 0 || findOrder[0].ispayment == true) {
         const createOrder = await order.create({
           id_user: +userId,
-          id_delivery: getDelivery.dataValues.id,
+          id_delivery: detailDelivery[0].id,
           quantity: cartData.length,
           subtotal: totalPrice,
           deliveryFee: 15000,
@@ -216,7 +222,7 @@ class Order {
         /* IF FOUND, UPDATE WITH THE NEW DATA IN DATABASE */
         await order.update({
           id_user: +userId,
-          id_delivery: detailDelivery.dataValues.id,
+          id_delivery: detailDelivery[0].id,
           quantity: cartData.length,
           subtotal: totalPrice,
           deliveryFee: 15000,
@@ -240,10 +246,6 @@ class Order {
         order: [['id', 'DESC']],
         limit: 1
       });
-
-      // redis.set(`detailDelivery`, JSON.stringify(detailDelivery))
-      // redis.set(`detailOrder`, JSON.stringify(getOrder))
-      // redis.set(`orderCart`, JSON.stringify(finalData))
 
       res.status(200).json({
         success: true,
@@ -469,38 +471,81 @@ class Order {
     }
   }
 
-  // async dashboardSeller(req, res, next) {
-  //   try {
-  //     const userId = req.userData.id;
-  //     const { idDelivery } = req.params
-  //     const checkUser = await user.findOne({
-  //       where: { id: +userId },
-  //     });
+  async dashboardSeller(req, res, next) {
+    try {
+      const userId = req.userData.id;
+      const checkUser = await user.findOne({
+        where: { id: +userId },
+      });
 
-  //     if (checkUser.id != userId) {
-  //       return res.status(401).json({
-  //         success: false,
-  //         errors: [
-  //           "You must signin first, because you don't have permission to access.",
-  //         ],
-  //       });
-  //     }
+      if (checkUser.id != userId) {
+        return res.status(401).json({
+          success: false,
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
+        });
+      }
 
-  //     const getOrder = await order.findAll({
-  //       where: { id: +userId },
-  //     });
+      const getOrder = await order.findAll({
+        where: { id: +userId },
+      });
 
-  //     res.status(201).json({
-  //       success: true,
-  //       message: ["Success edit delivery address"]
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     res
-  //       .status(500)
-  //       .json({ success: false, errors: ["Internal Server Error"] });
-  //   }
-  // }
+      const dashSeller = await seller.findAll({
+        where: {
+          sellerID: +userId
+        },
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"]
+        },
+        include: [
+          {
+            model: user,
+            attributes: ["firstName"],
+          },
+          {
+            model: user,
+            attributes: ["lastName"],
+          },
+          {
+            model: recipe,
+            attributes: ["title"],
+          }
+        ],
+      })
+
+      const finalData = []
+      for(let i = 0; i < dashSeller.length; i++) {
+          const obj = {
+            id_order: dashSeller[i].id_order,
+            buyer: dashSeller[i].user.firstName + ' ' + dashSeller[i].user.lastName,
+            orders: dashSeller[i].recipe.title,
+            quantity: 2,
+            delivery_name: dashSeller[i].delivery_name,
+            delivery_address: dashSeller[i].delivery_address,
+            delivery_phonenumber: dashSeller[i].delivery_phonenumber
+          }
+          const idx = finalData.findIndex(el => el.id_order === dashSeller[i].id_order)
+          if(idx >= 0 ) {
+            finalData[idx].quantity++
+        }else {
+            finalData.push(obj)
+        }
+      }
+        console.log("INI FINAL DATA", finalData);
+
+      const data = [...new Set(dashSeller)];
+      res.status(200).json({
+        success: true,
+        data: finalData
+      });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
 }
 
 module.exports = new Order();

@@ -17,7 +17,6 @@ passport.deserializeUser(function (obj, cb) {
   cb(null, obj);
 });
 
-// Logic to signin
 exports.facebook = (req, res, next) => {
   passport.authenticate("facebook", { session: false }, (err, user, info) => {
     if (err) {
@@ -95,7 +94,6 @@ passport.use(
   )
 );
 
-// Logic to signin
 exports.google = (req, res, next) => {
   passport.authenticate(
     "google",

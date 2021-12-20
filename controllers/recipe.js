@@ -1,12 +1,6 @@
 const { category, user, type, recipe, review, location, rating } = require("../models");
 const { Op } = require("sequelize");
 const { gte } = require("sequelize/dist/lib/operators");
-// const Redis = require("ioredis")
-// const redis = new Redis(process.env.REDIS_URL, {
-//   tls: {
-//       rejectUnauthorized: false
-//   }
-// });
 
 class Recipe {
   async createRecipeOne(req, res, next) {
@@ -22,7 +16,7 @@ class Recipe {
         description,
       } = req.body;
 
-      await recipe.create({
+      const data = await recipe.create({
         id_user: +userId,
         id_category,
         id_type,
@@ -35,7 +29,7 @@ class Recipe {
 
       res
         .status(201)
-        .json({ success: true, message: ["Create recipe Success!!"] });
+        .json({ success: true, data: data, message: ["Create recipe Success!!"] });
     } catch (error) {
       console.log(error);
       res
@@ -243,14 +237,9 @@ class Recipe {
       if (checkUser.id !== userId) {
         return res.status(401).json({
           success: false,
-          errors: ["You must have permission to delete it."],
+          errors: ["You must signin first, because you don't have permission to access."],
         });
       }
-
-      // const cache = await redis.get(`getRecipe${page}${limit}`)
-      // if (cache){
-      //   return res.status(200).json({ success: true, data: JSON.parse(cache) })
-      // }
 
       const data = await recipe.findAll({
         attributes: {
@@ -283,8 +272,6 @@ class Recipe {
         return res.status(404).json({ success: false, errors: ["Recipe not found"] });
       }
 
-      // redis.set(`getRecipe${page}${limit}`, JSON.stringify(data))
-
       res.status(200).json({ success: true, data: data });
     } catch (error) {
       console.log(error);
@@ -303,14 +290,9 @@ class Recipe {
       if (checkUser.id !== userId) {
         return res.status(401).json({
           success: false,
-          errors: ["You must have permission to delete it."],
+          errors: ["You must signin first, because you don't have permission to access."],
         });
       }
-
-      // const cache = await redis.get(`getRecipe${page}${limit}`)
-      // if (cache){
-      //   return res.status(200).json({ success: true, data: JSON.parse(cache) })
-      // }
 
       const data = await recipe.findAll({
         where: {
@@ -346,8 +328,6 @@ class Recipe {
         return res.status(404).json({ success: false, errors: ["Recipe not found"] });
       }
 
-      // redis.set(`getRecipe${page}${limit}`, JSON.stringify(data))
-
       res.status(200).json({ success: true, data: data });
     } catch (error) {
       console.log(error);
@@ -365,7 +345,7 @@ class Recipe {
       if (checkUser.id !== userId) {
         return res.status(401).json({
           success: false,
-          errors: ["You must have permission to delete it."],
+          errors: ["You must signin first, because you don't have permission to access."],
         });
       }
 
@@ -452,7 +432,7 @@ class Recipe {
       if (checkUser.id !== userId) {
         return res.status(401).json({
           success: false,
-          errors: ["You must have permission to delete it."],
+          errors: ["You must signin first, because you don't have permission to access."],
         });
       }
 
@@ -595,7 +575,12 @@ class Recipe {
         });
       }
 
-      let data = await recipe.destroy({ where: { id: req.params.id } });
+      let data = await recipe.destroy({
+        where: { 
+          id: req.params.id 
+        },
+        force: true
+        });
 
       if (!data) {
         return res
