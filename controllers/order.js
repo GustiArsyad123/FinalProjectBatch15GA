@@ -230,6 +230,7 @@ class Order {
         },
         {
           where: {
+            id: findOrder[0].id,
             id_user: +userId
           }
         })

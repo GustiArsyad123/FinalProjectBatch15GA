@@ -202,13 +202,24 @@ class Review {
       const idCategory = getRecipe.dataValues.id_category;
       const idType = getRecipe.dataValues.id_type;
 
-      await review.create({
-        id_user: +userId,
-        id_recipe: +idRecipe,
-        id_category: +idCategory,
-        id_type: +idType,
-        comment: comment,
-      });
+      // const checkReview = await review.findOne({
+      //   where: {
+      //     id_user: +userId,
+      //     id_recipe: +idRecipe,
+      //   }
+      // })
+
+      // if(checkReview == null){
+        await review.create({
+          id_user: +userId,
+          id_recipe: +idRecipe,
+          id_category: +idCategory,
+          id_type: +idType,
+          comment: comment,
+        });
+      // } else {  
+      //   return res.status(400).json({ success: false, errors: ["You can review maximum 1 per recipe"]})
+      // }
 
       res.status(201).json({
         success: true,

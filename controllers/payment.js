@@ -138,7 +138,6 @@ module.exports = {
         },
       }
       
-      // always. always, simpan semua data yang kita kirim ke 3rd party service
       const paymentResponse = await axios.post(XENDIT_URL, paymentPayload, paymentConfig)
       res.status(200).json({
         success: true,
@@ -236,7 +235,6 @@ module.exports = {
         }
 
         const removeDuplicateEmail = [...new Set(emailSeller)];
-        console.log("INI EMAIL SELLER NO DUPLICATE", removeDuplicateEmail);
 
         /* Function to send complete payment email to seller */
         var transporter = nodemailer.createTransport({
@@ -289,7 +287,6 @@ module.exports = {
         }
 
         const removeDuplicateID = [...new Set(idOfRecipe)];
-        console.log("INI ID RECIPE NO DUPLICATE", removeDuplicateID);
 
         let detailOrder = await order.findAll({
           where: {
@@ -316,8 +313,6 @@ module.exports = {
           order: [['id', 'DESC']],
           limit: 1
         })
-
-        console.log("INI detailOrder", detailOrder.dataValues);
 
         for(let i = 0; i < finalData.length; i++){
           await seller.create({

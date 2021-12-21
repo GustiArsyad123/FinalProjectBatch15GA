@@ -13,6 +13,7 @@ router.use('/cart', cart);
 router.use("/user", user);
 router.use("/recipe", recipe);
 router.use("/review", review);
+router.use("/rating", rating);
 router.use("/order", order);
 
 module.exports = router;

@@ -378,7 +378,7 @@ class Recipe {
         ],
       });
 
-      const allComments = await review.findAll({
+      const comments = await review.findAll({
         include: [{ model: user, attributes: ["userName", "image"] }],
         where: { id_recipe: req.params.id },
         attributes: {
@@ -387,19 +387,52 @@ class Recipe {
         },
       });
 
-      const allRatings = await rating.findAll({
+      const ratings = await rating.findAll({
         include: [{ model: user, attributes: ["userName", "image"] }],
         where: { id_recipe: req.params.id },
         attributes: {
           include: ["value"],
-          exclude: ["deletedAt"],
+          exclude: ["createdAt", "updatedAt", "deletedAt"],
         },
       });
 
+      /* Merge comments and ratings */
+      const finalArr = []
+      for(let i = 0 ; i < comments.length ; i++) {
+          const finalObj = {
+          id_user : comments[i].id_user,
+          id_recipe: comments[i].id_recipe,
+          comment: comments[i].comment,
+          commentTime: comments[i].dataValues.commentTime
+        }
+
+        const idxComm = ratings.findIndex((el) =>el.id_user === comments[i].id_user)
+        if(idxComm > 0) {
+          finalObj["ratingsValue"] = ratings[idxComm].value
+        }
+        finalObj.user = comments[i].user
+        finalArr.push(finalObj)    
+      }
+    
+      for(let i = 0 ; i < ratings.length ; i++) {
+        const finalObj = {
+          id_user : ratings[i].id_user,
+          id_recipe: ratings[i].id_recipe,
+          ratingsValue : ratings[i].value,
+          user: ratings[i].user
+        }
+        const idx = finalArr.findIndex(el => el.id_user == ratings[i].id_user)
+        if(idx < 0) {
+          finalArr.push(finalObj)
+        }
+      }
+
+      /* Sum all ratings */
       const sumRatings = await rating.sum("value", {
         where: { id_recipe: req.params.id },
       });
 
+      /* Count all ratings */
       const countRatings = await rating.count({
         where: { id_recipe: req.params.id },
       });
@@ -412,7 +445,13 @@ class Recipe {
           .json({ success: false, errors: ["Recipe not found"] });
       }
 
-      res.status(200).json({ success: true, data: data, allComments, averageRatings, peopleRatings: allRatings.length, allRatings });
+      res.status(200).json({ 
+        success: true,
+        data: data,
+        averageRatings,
+        peopleRatings: ratings.length,
+        commentAndRating: finalArr
+      });
     } catch (error) {
       console.log(error);
       res

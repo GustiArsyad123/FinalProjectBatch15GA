@@ -20,11 +20,22 @@ class Rating {
         });
       }
 
-      await rating.create({
-        value: value,
-        id_user: +userId,
-        id_recipe: +idRecipe
-      });
+      const checkRating = await rating.findOne({
+        where: {
+          id_user: +userId,
+          id_recipe: +idRecipe
+        }
+      })
+
+      if(checkRating == null){
+        await rating.create({
+          value: value,
+          id_user: +userId,
+          id_recipe: +idRecipe
+        });
+      } else {
+        return res.status(400).json({ success: false, errors: ["You can rating maximum 1 per recipe"]})
+      }
 
       res.status(201).json({ success: true, message: ["Success Add Rating"] });
     } catch (error) {
