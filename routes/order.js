@@ -1,5 +1,7 @@
 const express = require("express");
-const { uploadReceiptValidator } = require("../middlewares/validators/uploadReceiptValidator");
+const {
+  uploadReceiptValidator,
+} = require("../middlewares/validators/uploadReceiptValidator");
 const { authentication } = require("../middlewares/Auth/authentication");
 
 const {
@@ -8,7 +10,8 @@ const {
   editAddressDelivery,
   confirmPayment,
   updateReceipt,
-  dashboardSeller
+  dashboardSeller,
+  getMyOrder,
 } = require("../controllers/order");
 
 const { checkout, callbackURL } = require("../controllers/payment");
@@ -21,7 +24,7 @@ router.post("/", uploadReceiptValidator, authentication, createPayment);
 router.patch("/:idDelivery", authentication, editAddressDelivery);
 router.get("/confirmpayment", authentication, confirmPayment);
 router.put("/", uploadReceiptValidator, authentication, updateReceipt);
-router.post('/checkout',  checkout)
-router.post('/xendit-cb',  callbackURL)
-
+router.post("/checkout", checkout);
+router.post("/xendit-cb", callbackURL);
+router.get("/myorder", authentication, getMyOrder);
 module.exports = router;
