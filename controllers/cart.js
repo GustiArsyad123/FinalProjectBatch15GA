@@ -16,7 +16,7 @@ class Cart {
       }
 
       const data = await cart.findAll({
-        where: { id_user: +userId },
+        where: { id_user: +userId, ispayment: false },
         attributes: {
           exclude: ["createdAt", "updatedAt", "deletedAt"],
         },
@@ -119,7 +119,6 @@ class Cart {
         } else {
           return res.status(400).json({ success: false, message: 'Stock tidak cukup dengan quantity yang diminta'})
         }
-
       }
 
       const semuaCart = getPreviousCart.length + total.length 
@@ -127,6 +126,7 @@ class Cart {
       const quantityCart = await cart.findAll({
         where: {
           id_user: +userId,
+          ispayment: false
         }
       })
 
