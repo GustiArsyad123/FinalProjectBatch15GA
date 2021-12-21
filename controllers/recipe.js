@@ -1,6 +1,29 @@
-const { category, user, type, recipe, review, location, rating } = require("../models");
+const {
+  category,
+  user,
+  type,
+  recipe,
+  review,
+  location,
+  rating,
+} = require("../models");
 const { Op } = require("sequelize");
 const { gte } = require("sequelize/dist/lib/operators");
+
+const pagination = (page, size) => {
+  const limit = size ? +size : 6;
+  const offset = ((page - 1) * limit) | 0;
+
+  return { limit, offset };
+};
+
+const paging = (data, page, limit) => {
+  const { count: totalItems, rows: recipe } = data;
+  const currentPage = page ? +page : 1;
+  const totalPages = Math.ceil(totalItems / limit);
+
+  return { totalItems, recipe, totalPages, currentPage };
+};
 
 class Recipe {
   async createRecipeOne(req, res, next) {
@@ -27,9 +50,11 @@ class Recipe {
         description,
       });
 
-      res
-        .status(201)
-        .json({ success: true, data: data, message: ["Create recipe Success!!"] });
+      res.status(201).json({
+        success: true,
+        data: data,
+        message: ["Create recipe Success!!"],
+      });
     } catch (error) {
       console.log(error);
       res
@@ -79,7 +104,9 @@ class Recipe {
       );
 
       if (updatedData[0] === 0) {
-        return res.status(404).json({ success: false, errors: ["recipe not found"] });
+        return res
+          .status(404)
+          .json({ success: false, errors: ["recipe not found"] });
       }
 
       res
@@ -87,7 +114,9 @@ class Recipe {
         .json({ success: true, message: ["Success update your recipe"] });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -118,13 +147,19 @@ class Recipe {
       );
 
       if (updatedData[0] == 0) {
-        return res.status(404).json({ success: false, errors: ["recipe not found"] });
+        return res
+          .status(404)
+          .json({ success: false, errors: ["recipe not found"] });
       }
 
-      res.status(201).json({ success: true, message: ["Success update your recipe"] });
+      res
+        .status(201)
+        .json({ success: true, message: ["Success update your recipe"] });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -157,12 +192,18 @@ class Recipe {
       );
 
       if (updatedData[0] == 0) {
-        return res.status(404).json({ success: false, errors: ["recipe not found"] });
+        return res
+          .status(404)
+          .json({ success: false, errors: ["recipe not found"] });
       }
 
-      res.status(201).json({ success: true, message: ["Success update your recipe"] });
+      res
+        .status(201)
+        .json({ success: true, message: ["Success update your recipe"] });
     } catch (error) {
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -185,7 +226,7 @@ class Recipe {
           [Op.and]: {
             id_category: cat,
             id_type: type,
-            id_location: loc
+            id_location: loc,
           },
           price: {
             [Op.between]: [gte, lte],
@@ -222,13 +263,16 @@ class Recipe {
       res.status(200).json({ success: true, data: data });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
   async getAllRecipe(req, res, next) {
     try {
-      let { page = 1, limit = 6 } = req.query;
+      const { page, size } = req.query;
+      const { limit, offset } = pagination(page, size);
       const userId = req.userData.id;
       const checkUser = await user.findOne({
         where: { id: userId },
@@ -237,11 +281,13 @@ class Recipe {
       if (checkUser.id !== userId) {
         return res.status(401).json({
           success: false,
-          errors: ["You must signin first, because you don't have permission to access."],
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
         });
       }
 
-      const data = await recipe.findAll({
+      const data = await recipe.findAndCountAll({
         attributes: {
           exclude: ["createdAt", "deletedAt", "updatedAt"],
         },
@@ -264,18 +310,22 @@ class Recipe {
           },
         ],
         order: [["createdAt", "DESC"]],
-        limit: +limit,
-        offset: (+page - 1) * parseInt(limit),
+        limit,
+        offset,
       });
 
       if (data == null) {
-        return res.status(404).json({ success: false, errors: ["Recipe not found"] });
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Recipe not found"] });
       }
 
-      res.status(200).json({ success: true, data: data });
+      res.status(200).json(paging(data, page, limit));
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -290,13 +340,15 @@ class Recipe {
       if (checkUser.id !== userId) {
         return res.status(401).json({
           success: false,
-          errors: ["You must signin first, because you don't have permission to access."],
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
         });
       }
 
       const data = await recipe.findAll({
         where: {
-          id_user: +userId
+          id_user: +userId,
         },
         attributes: {
           exclude: ["createdAt", "deletedAt", "updatedAt"],
@@ -325,13 +377,17 @@ class Recipe {
       });
 
       if (data == null) {
-        return res.status(404).json({ success: false, errors: ["Recipe not found"] });
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Recipe not found"] });
       }
 
       res.status(200).json({ success: true, data: data });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, errors: ["Internal Server Error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
     }
   }
 
@@ -345,7 +401,9 @@ class Recipe {
       if (checkUser.id !== userId) {
         return res.status(401).json({
           success: false,
-          errors: ["You must signin first, because you don't have permission to access."],
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
         });
       }
 
@@ -374,7 +432,7 @@ class Recipe {
           {
             model: location,
             attributes: ["name"],
-          }
+          },
         ],
       });
 
@@ -397,33 +455,37 @@ class Recipe {
       });
 
       /* Merge comments and ratings */
-      const finalArr = []
-      for(let i = 0 ; i < comments.length ; i++) {
-          const finalObj = {
-          id_user : comments[i].id_user,
+      const finalArr = [];
+      for (let i = 0; i < comments.length; i++) {
+        const finalObj = {
+          id_user: comments[i].id_user,
           id_recipe: comments[i].id_recipe,
           comment: comments[i].comment,
-          commentTime: comments[i].dataValues.commentTime
-        }
+          commentTime: comments[i].dataValues.commentTime,
+        };
 
-        const idxComm = ratings.findIndex((el) =>el.id_user === comments[i].id_user)
-        if(idxComm > 0) {
-          finalObj["ratingsValue"] = ratings[idxComm].value
+        const idxComm = ratings.findIndex(
+          (el) => el.id_user === comments[i].id_user
+        );
+        if (idxComm > 0) {
+          finalObj["ratingsValue"] = ratings[idxComm].value;
         }
-        finalObj.user = comments[i].user
-        finalArr.push(finalObj)    
+        finalObj.user = comments[i].user;
+        finalArr.push(finalObj);
       }
-    
-      for(let i = 0 ; i < ratings.length ; i++) {
+
+      for (let i = 0; i < ratings.length; i++) {
         const finalObj = {
-          id_user : ratings[i].id_user,
+          id_user: ratings[i].id_user,
           id_recipe: ratings[i].id_recipe,
-          ratingsValue : ratings[i].value,
-          user: ratings[i].user
-        }
-        const idx = finalArr.findIndex(el => el.id_user == ratings[i].id_user)
-        if(idx < 0) {
-          finalArr.push(finalObj)
+          ratingsValue: ratings[i].value,
+          user: ratings[i].user,
+        };
+        const idx = finalArr.findIndex(
+          (el) => el.id_user == ratings[i].id_user
+        );
+        if (idx < 0) {
+          finalArr.push(finalObj);
         }
       }
 
@@ -445,12 +507,12 @@ class Recipe {
           .json({ success: false, errors: ["Recipe not found"] });
       }
 
-      res.status(200).json({ 
+      res.status(200).json({
         success: true,
         data: data,
         averageRatings,
         peopleRatings: ratings.length,
-        commentAndRating: finalArr
+        commentAndRating: finalArr,
       });
     } catch (error) {
       console.log(error);
@@ -471,7 +533,9 @@ class Recipe {
       if (checkUser.id !== userId) {
         return res.status(401).json({
           success: false,
-          errors: ["You must signin first, because you don't have permission to access."],
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
         });
       }
 
@@ -615,11 +679,11 @@ class Recipe {
       }
 
       let data = await recipe.destroy({
-        where: { 
-          id: req.params.id 
+        where: {
+          id: req.params.id,
         },
-        force: true
-        });
+        force: true,
+      });
 
       if (!data) {
         return res
