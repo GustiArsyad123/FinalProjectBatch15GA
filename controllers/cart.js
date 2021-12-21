@@ -98,12 +98,12 @@ class Cart {
       })
 
       const recipeStock = checkStock.dataValues.stock
-      console.log(recipeStock);
 
       const getPreviousCart = await cart.findAll({
         where: {
           id_user: +userId,
-          id_recipe: +idRecipe
+          id_recipe: +idRecipe,
+          ispayment: false
         }
       })
 
@@ -111,7 +111,8 @@ class Cart {
       for (let i = 0; i < quantity; i++) {
         let addToCart = await cart.create({
           id_user: +userId,
-          id_recipe: +idRecipe
+          id_recipe: +idRecipe,
+          ispayment: false
         });
         if(quantity <= recipeStock){
           total.push(addToCart)

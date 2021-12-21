@@ -66,7 +66,10 @@ module.exports = {
 
       /* FIND RECIPES IN CART */
       const cartData = await cart.findAll({
-        where: { id_user: +userId },
+        where: { 
+          id_user: +userId,
+          ispayment: false, 
+        },
         attributes: {
           exclude: ["id_user", "createdAt", "deletedAt", "updatedAt"],
         },
@@ -158,25 +161,52 @@ module.exports = {
       const id = idArray[0]
       
       if(Number.isInteger(+id) && req.body.status == 'PAID'){
+        const findLatestOrder = await order.findAll({
+          where: {
+            id_user: +id
+          },
+          order: [["id", "DESC"]],
+          limit: 1
+        })
+
         await order.update({
           ispayment: true
         },{
           where: {
-            id_user: +id
+            id: findLatestOrder[0].id,
+            id_user: +id,
           }, 
+        })
+
+        const findLatestDelivery = await delivery.findAll({
+          where: {
+            usernya: +id
+          },
+          order: [["id", "DESC"]],
+          limit: 1
         })
 
         await delivery.update({
           ispayment: true
         },{
           where: {
+            id: findLatestDelivery[0].id,
             usernya: +id
           }, 
         })
 
+        // const findCartData = await cart.findAll({
+        //   where: {
+        //     id_user: +id
+        //   },
+        //   order: [["id", "DESC"]],
+        //   limit: 1
+        // })
+
         const getOrder = await cart.findAll({
           where: {
-            id_user: +id
+            id_user: +id,
+            ispayment: false
           },
           include: [
             {
@@ -314,6 +344,16 @@ module.exports = {
           limit: 1
         })
 
+        await cart.update({
+          ispayment: true,
+          id_order: detailOrder[0].id,
+        },{
+          where: {
+            id_user: +id,
+            ispayment: false
+          }, 
+        })
+
         for(let i = 0; i < finalData.length; i++){
           await seller.create({
             id_order: detailOrder[0].id,
@@ -327,15 +367,16 @@ module.exports = {
           })
         }
 
-        for(let i = 0; i < removeDuplicateID.length; i++){
-          await cart.destroy({
-            where: {
-              id_user: +id,
-              id_recipe: removeDuplicateID[i]
-            },
-            force: true
-          })
-        }
+
+        // for(let i = 0; i < removeDuplicateID.length; i++){
+        //   await cart.destroy({
+        //     where: {
+        //       id_user: +id,
+        //       id_recipe: removeDuplicateID[i]
+        //     },
+        //     force: true
+        //   })
+        // }
         }
       }
 

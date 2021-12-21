@@ -119,7 +119,10 @@ class Order {
 
       /* FIND ALL DATA IN CART */
       const cartData = await cart.findAll({
-        where: { id_user: +userId },
+        where: { 
+          id_user: +userId,
+          ispayment: false
+        },
         attributes: {
           exclude: ["id_user", "createdAt", "deletedAt", "updatedAt"],
         },
