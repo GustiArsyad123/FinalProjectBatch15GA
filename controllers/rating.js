@@ -1,12 +1,11 @@
 const { rating, user } = require("../models");
 
 class Rating {
-    async createRating(req, res, next) {
+  async createRating(req, res, next) {
     try {
-
-    const userId = req.userData.id;
-    const { value } = req.body;
-    const { idRecipe } = req.params
+      const userId = req.userData.id;
+      const { value } = req.body;
+      const { idRecipe } = req.params;
       const checkUser = await user.findOne({
         where: { id: userId },
       });
@@ -20,36 +19,49 @@ class Rating {
         });
       }
 
-      const checkRating = await rating.findOne({
-        where: {
-          id_user: +userId,
-          id_recipe: +idRecipe
-        }
-      })
+      // const checkRating = await rating.findOne({
+      //   where: {
+      //     id_user: +userId,
+      //     id_recipe: +idRecipe,
+      //   },
+      // });
 
-      if(checkRating == null){
-        await rating.create({
-          value: value,
-          id_user: +userId,
-          id_recipe: +idRecipe
-        });
-      } else {
-        return res.status(400).json({ success: false, errors: ["You can rating maximum 1 per recipe"]})
-      }
+      // if (checkRating == null) {
+      //   await rating.create({
+      //     value: value,
+      //     id_user: +userId,
+      //     id_recipe: +idRecipe,
+      //   });
+      // } else {
+      //   return res
+      //     .status(400)
+      //     .json({
+      //       success: false,
+      //       errors: ["You can rating maximum 1 per recipe"],
+      //     });
+      // }
 
-      res.status(201).json({ success: true, message: ["Success Add Rating"] });
+      const data = await rating.create({
+        value: value,
+        id_user: +userId,
+        id_recipe: +idRecipe,
+      });
+
+      res
+        .status(201)
+        .json({ success: true, data: data, message: ["Success Add Rating"] });
     } catch (error) {
       console.log(error);
-        res.status(500).json({ success: false, errors: ["Internal server error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal server error"] });
     }
   }
 
-
   async getRating(req, res, next) {
     try {
-
       const userId = req.userData.id;
-      const { idRecipe } = req.params
+      const { idRecipe } = req.params;
       const checkUser = await user.findOne({
         where: { id: userId },
       });
@@ -66,7 +78,7 @@ class Rating {
       const data = await rating.findAll({
         where: {
           id_user: +userId,
-          id_recipe: +idRecipe
+          id_recipe: +idRecipe,
         },
         attributes: {
           exclude: ["createdAt", "updatedAt", "deletedAt"],
@@ -75,7 +87,9 @@ class Rating {
       res.status(201).json({ success: true, data: data });
     } catch (error) {
       console.log(error);
-        res.status(500).json({ success: false, errors: ["Internal server error"] });
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal server error"] });
     }
   }
 }

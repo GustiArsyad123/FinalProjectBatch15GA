@@ -329,6 +329,62 @@ class Recipe {
     }
   }
 
+  async getAllRecipeMobile(req, res, next) {
+    try {
+      const userId = req.userData.id;
+      const checkUser = await user.findOne({
+        where: { id: userId },
+      });
+
+      if (checkUser.id !== userId) {
+        return res.status(401).json({
+          success: false,
+          errors: [
+            "You must signin first, because you don't have permission to access.",
+          ],
+        });
+      }
+
+      const data = await recipe.findAndCountAll({
+        attributes: {
+          exclude: ["createdAt", "deletedAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: user,
+            attributes: ["userName"],
+          },
+          {
+            model: category,
+            attributes: ["name"],
+          },
+          {
+            model: type,
+            attributes: ["name"],
+          },
+          {
+            model: location,
+            attributes: ["name"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      if (data == null) {
+        return res
+          .status(404)
+          .json({ success: false, errors: ["Recipe not found"] });
+      }
+
+      res.status(200).json({ success: true, data: data });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, errors: ["Internal Server Error"] });
+    }
+  }
+
   async myRecipe(req, res, next) {
     try {
       let { page = 1, limit = 6 } = req.query;
@@ -453,6 +509,7 @@ class Recipe {
           exclude: ["createdAt", "updatedAt", "deletedAt"],
         },
       });
+      console.log(ratings, "ini rating");
 
       /* Merge comments and ratings */
       const finalArr = [];
@@ -467,12 +524,14 @@ class Recipe {
         const idxComm = ratings.findIndex(
           (el) => el.id_user === comments[i].id_user
         );
-        if (idxComm > 0) {
+        if (idxComm >= 0) {
           finalObj["ratingsValue"] = ratings[idxComm].value;
         }
         finalObj.user = comments[i].user;
         finalArr.push(finalObj);
       }
+      // console.log("ini idxcom", idxComm);
+      // console.log(ratings[idxComm].value);
 
       for (let i = 0; i < ratings.length; i++) {
         const finalObj = {
@@ -481,13 +540,16 @@ class Recipe {
           ratingsValue: ratings[i].value,
           user: ratings[i].user,
         };
+        console.log([ratings.length], "panjanggggggggg");
         const idx = finalArr.findIndex(
           (el) => el.id_user == ratings[i].id_user
         );
+        console.log("idx", idx);
         if (idx < 0) {
           finalArr.push(finalObj);
         }
       }
+      console.log("finalObj", finalArr);
 
       /* Sum all ratings */
       const sumRatings = await rating.sum("value", {

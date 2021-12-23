@@ -125,9 +125,9 @@ class Order {
 
       /* FIND ALL DATA IN CART */
       const cartData = await cart.findAll({
-        where: { 
+        where: {
           id_user: +userId,
-          ispayment: false
+          ispayment: false,
         },
         attributes: {
           exclude: ["id_user", "createdAt", "deletedAt", "updatedAt"],
@@ -260,7 +260,7 @@ class Order {
         },
         attributes: {
           exclude: [
-            "id_recipe",
+            // "id_recipe",
             "id_category",
             "id_type",
             "createdAt",
@@ -370,7 +370,7 @@ class Order {
       let cnt = 0;
 
       let amount = [];
-      for (var i = 0; i < titleAndAmount.length; i++) {
+      for (let i = 0; i < titleAndAmount.length; i++) {
         if (titleAndAmount[i] != resep) {
           if (cnt > 0) {
             amount.push(cnt);
